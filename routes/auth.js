@@ -31,7 +31,7 @@ authRoutes.post("/signup", (req, res, next) => {
 
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
-    let hashConfirm = bcrypt.hashSync(username, salt).split('');
+    let hashConfirm = bcrypt.hashSync(username, salt);
     const confirmationCode = hashConfirm.split('').filter(element => element!== '/').join('');
 
     const newUser = new User({
@@ -50,7 +50,6 @@ authRoutes.post("/signup", (req, res, next) => {
     });
   });
 });
-
 
 function checkStatus() {
   return function(req, res, next) {
