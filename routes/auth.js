@@ -31,6 +31,8 @@ authRoutes.post("/signup", (req, res, next) => {
 
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
+    const hashConfirm = bcrypt.hashSync(username, salt);
+    
 
     const newUser = new User({
       username,
@@ -48,6 +50,17 @@ authRoutes.post("/signup", (req, res, next) => {
   });
 });
 
+
+function checkStatus() {
+  return function(req, res, next) {
+    if (req.isAuthenticated() && req.user.status) {
+      return next();
+    } else {
+      res.redirect('users/login')
+    }
+  }
+}
+
 authRoutes.get("/login", (req, res, next) => {
   res.render("users/login", { "message": req.flash("error") });
 });
@@ -58,7 +71,7 @@ authRoutes.post("/login", passport.authenticate("local", {
   failureRedirect: "/login",
   failureFlash: true,
   passReqToCallback: true
-}), (req, res, next) => {
+}), checkStatus(), (req, res, next) => {
   const userId = req.user._id;
   res.redirect(`/user/${userId}`); //  we redirect logged in user to /user/userId (his/her profile)
 });
