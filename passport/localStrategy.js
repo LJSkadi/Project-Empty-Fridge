@@ -3,7 +3,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const User          = require('../models/User');
 const bcrypt        = require('bcrypt');
 
-passport.use(new LocalStrategy({usernameField: 'email'}, (email, password, next) => {
+passport.use(new LocalStrategy( {usernameField: 'email'}, (email, password, next) => {
   User.findOne({ email }, (err, foundUser) => {
     if (err) {
       next(err);
@@ -12,6 +12,11 @@ passport.use(new LocalStrategy({usernameField: 'email'}, (email, password, next)
 
     if (!foundUser) {
       next(null, false, { message: 'Incorrect email-address' });
+      return;
+    }
+
+    if (!foundUser.status) {
+      next(null, false, { message: 'You should confirm your account before proceeding. Look your emails or require a new confirmation email.' });
       return;
     }
 
