@@ -31,13 +31,14 @@ authRoutes.post("/signup", (req, res, next) => {
 
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
-    const hashConfirm = bcrypt.hashSync(username, salt);
-    
+    let hashConfirm = bcrypt.hashSync(username, salt).split('');
+    const confirmationCode = hashConfirm.split('').filter(element => element!== '/').join('');
 
     const newUser = new User({
       username,
       email,
-      password: hashPass
+      password: hashPass,
+      confirmationCode
     });
 
     newUser.save((err) => {
