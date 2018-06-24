@@ -32,10 +32,13 @@ authRoutes.post("/signup", (req, res, next) => {
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
 
+    
+
     const newUser = new User({
       username,
       email,
-      password: hashPass
+      password: hashPass,
+      confirmationCode
     });
 
     newUser.save((err) => {
@@ -48,7 +51,18 @@ authRoutes.post("/signup", (req, res, next) => {
   });
 });
 
-authRoutes.get("/login", (req, res, next) => {
+
+function checkStatus() {
+  return function(req, res, next) {
+    if (req.isAuthenticated() && req.user.status) {
+      return next();
+    } else {
+      res.redirect('users/login')
+    }
+  }
+}
+
+authRoutes.get("/login", checkRoles(), (req, res, next) => {
   res.render("users/login", { "message": req.flash("error") });
 });
 
