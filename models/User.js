@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
 
 const userSchema = new Schema({
-  username: String,
-  email:    String,
+  username: {type: String, required: true, unique: true},
+  email:    {type: String, required: true, unique: true},
   password: String,
   //image: String,
   confirmationCode: String,
   //_list: [],
-  status: Boolean,
+  status: {type: Boolean, default: false}
 }, {
   timestamps: {
     createdAt: 'created_at',
