@@ -9,18 +9,18 @@ const bcryptSalt = 10;
 
 
 authRoutes.get("/login", (req, res, next) => {
-  res.render("auth/login", { "message": req.flash("error") });
+  res.render("users/login", { "message": req.flash("error") });
 });
 
 authRoutes.post("/login", passport.authenticate("local", {
-  successRedirect: "/user",
-  failureRedirect: "/auth/login",
+  successRedirect: "/",
+  failureRedirect: "/login",
   failureFlash: true,
   passReqToCallback: true
 }));
 
 authRoutes.get("/signup", (req, res, next) => {
-  res.render("auth/signup");
+  res.render("users/signup");
 });
 
 authRoutes.post("/signup", (req, res, next) => {
@@ -28,13 +28,13 @@ authRoutes.post("/signup", (req, res, next) => {
   const password = req.body.password;
   const rol = req.body.role;
   if (username === "" || password === "") {
-    res.render("auth/signup", { message: "Indicate username and password" });
+    res.render("users/signup", { message: "Indicate username and password" });
     return;
   }
 
   User.findOne({ username }, "username", (err, user) => {
     if (user !== null) {
-      res.render("auth/signup", { message: "The username already exists" });
+      res.render("users/signup", { message: "The username already exists" });
       return;
     }
 
@@ -43,13 +43,12 @@ authRoutes.post("/signup", (req, res, next) => {
 
     const newUser = new User({
       username,
-      password: hashPass,
-      role:"teacher"
+      password: hashPass
     });
 
     newUser.save((err) => {
       if (err) {
-        res.render("auth/signup", { message: "Something went wrong" });
+        res.render("users/signup", { message: "Something went wrong" });
       } else {
         res.redirect("/");
       }
