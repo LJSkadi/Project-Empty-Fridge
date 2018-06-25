@@ -10,33 +10,35 @@ const privateRoutes = express.Router();
 
 //#region LIST
 //#region GET /Profilpage
-// privateRoutes.get('/user/:userId',(req, res, next) => {
-//   Promise.all(
-//     [User.findOne( { "_id": req.params.userId } ),
-//     List.find( { _creator : req.params.userId })]
-//   )
-//   .then( ( user, lists ) => {
-//     res.render( 'users/profile', { user, lists } );
-//   } )
-//   .catch( err => { throw err } );
-// });
-// //#endregion
+privateRoutes.get('/user/:userId',(req, res, next) => {
+  Promise.all(
+    [User.findOne( { "_id": req.params.userId } ),
+    List.find( { _creator : req.params.userId })]
+  )
+  .then( ( array ) => {
+    console.log(array);
+    //console.log(lists);
+    res.render( 'users/profile', { user: array[0], lists: array[1]} );
+  } )
+  .catch( err => { throw err } );
+});
+//#endregion
 
 
 //This is an alternative solution
-privateRoutes.get('/user/:userId', (req, res, next) => {
-  User.findOne({ "_id": req.params.userId })
-    .then(user => {
-      List.find( { _creator : req.params.userId } )
-        .then(lists => {
-          res.render('users/profile', { user, lists })
-        }
-        )
-        .catch(err => { throw err })
-   })
-    .catch(err => 
-      { throw err });
-});
+// privateRoutes.get('/user/:userId', (req, res, next) => {
+//   User.findOne({ "_id": req.params.userId })
+//     .then(user => {
+//       List.find( { _creator : req.params.userId } )
+//         .then(lists => {
+//           res.render('users/profile', { user, lists })
+//         }
+//         )
+//         .catch(err => { throw err })
+//    })
+//     .catch(err => 
+//       { throw err });
+// });
 
 //#region CREATE LIST
 //#region GET/new-list
