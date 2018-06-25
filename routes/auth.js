@@ -10,7 +10,7 @@ const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 
 // create a transporter object for nodemailer
-let transporter = nodemailer.transporter({
+let transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
     user: process.env.GMAIL_ADDRESS,
@@ -42,7 +42,7 @@ authRoutes.post("/signup", (req, res, next) => {
 
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(password, salt);
-    let hashConfirm = bcrypt.hashSync(username, salt).split('');
+    let hashConfirm = bcrypt.hashSync(username, salt);
     const confirmationCode = hashConfirm.split('').filter(element => element!== '/').join('');
 
     const newUser = new User({
@@ -54,30 +54,32 @@ authRoutes.post("/signup", (req, res, next) => {
 
     // email content for the new user with a link to confirmation code
     const subject = "Confirm your account at emptyfridge.com";
-    const message = `Hi ${username},
-      we have created an account for you inside our application.
-      Please, confirm your account clicking on this
-      <a href="localhost:3000/confirm/${confirmationCode}">confirmation link</a>.
-    `;
-
-    transporter.sendMail({
-      from: '"Empty Fridge Project 👻" <empty.fridge@gmail.com>',
-      to: email, 
-      subject: subject, 
-      text: message,
-      html: `<b>${message}</b>`
-    })
-    .then(info => {
-      console.log( "EMAIL SENT!!!", info );
-      newUser.save((err) => {
-        if (err) {
-          res.render("users/signup", { message: "Something went wrong" });
-        } else {
-          res.redirect("/");
-        }
-      });
-    })
-    .catch(error => console.log(error));
+    const message = "we have created an account for you inside our application. Please, confirm your account clicking on this";
+      
+    newUser.save( (err) => {
+      if (err) {
+        res.render("users/signup", { message: "Something went wrong" });
+      } else {
+        transporter.sendMail({
+          from: '"Empty Fridge Project 👻" <empty.fridge@gmail.com>',
+          to: email, 
+          subject: subject, 
+          text: message,
+          html: `<b>Hi ${username}, ${message} <a href='http://localhost:3000/confirm/${confirmationCode}'>confirmation link</a></b>`
+        })
+        .then(info => {
+          console.log( "EMAIL SENT!!!", info );
+          console.log( "Redirecting new user to login page." )
+          res.redirect("/login");
+        })
+        .catch(error => {
+          console.log("ERROR CREATING USER: ", error);
+          console.log( "Redirecting new user to login page." )
+          res.redirect("/login");
+        });
+        
+      }
+    });
   });
 });
 
@@ -96,6 +98,23 @@ authRoutes.post("/login", passport.authenticate("local", {
   const userId = req.user._id;
   res.redirect(`/user/${userId}`); //  we redirect logged in user to /user/userId (his/her profile)
 });
+
+//#region GET /confirm/ from email
+authRoutes.get('/confirm/:confirmationCode', (req,res, next) => {
+  const hashCode = req.params.confirmationCode;
+  User.findOne({ confirmationCode: hashCode })
+  .then( user => {
+    User.findByIdAndUpdate(user._id, { status: true })
+    .then(updatedUser => {
+      console.log( "Welcome! User account activated." );
+      res.render('users/login', {
+        message: "Your account is activated. Now you can login."
+      });
+    })
+  })
+  .catch( err => { throw err })
+});
+//#endregion
 
 authRoutes.use( (req, res, next) => {
   if ( req.isAuthenticated() ) {
