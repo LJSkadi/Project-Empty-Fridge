@@ -133,21 +133,6 @@ authRoutes.use( (req, res, next) => {
 //#endregion
 //#endregion
 
-//#region GET /Profilpage
-authRoutes.get('/user/:userId',(req, res, next) => {
-  User.findOne( { "_id": req.params.userId } )
-  .then( user => {
-    res.render( 'users/profile', user);
-  } )
-  .catch( err => { throw err } );
-});
-//#endregion
 
-//#region GET /logout
-authRoutes.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
-});
-//#endregion
 
 module.exports = authRoutes;
