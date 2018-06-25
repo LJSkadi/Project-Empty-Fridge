@@ -5,7 +5,16 @@ const   listSchema = new Schema({
   name:    {type: String, default: `New List from ${(new Date().getDate())} - ${(new Date().getMonth())+1} - ${(new Date().getFullYear())}`},
   _creator: {type: Schema.Types.ObjectId , ref: 'User', required: true},
   _members: [{type:[Schema.Types.ObjectId], ref: 'User'}],
-  _items: [{type:[Schema.Types.ObjectId], ref: 'Item'}],
+  items: [{
+            _creator: {type: Schema.Types.ObjectId , ref: 'User', required: true},
+            content: {type: String, required: true},
+            status: {
+                      type: String,
+                      enum : ['OPEN', 'CLOSED', 'DELETED'],
+                      default : 'OPEN'
+            },
+            _fullFiller: {type: Schema.Types.ObjectId, ref: 'User'},
+        }],
 }, {
   timestamps: {
     createdAt: 'created_at',
