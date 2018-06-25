@@ -1,0 +1,12 @@
+<!-- receivedInvitation.hbs -->
+
+<div class="card" style="width: 18rem;">
+    <img class="card-img-top" src="{{this._sendingUser.image}}" alt="Card image cap">
+    <div class="card-body">
+        <p class="card-title">
+            <strong>{{this._sendingUser.username}}</strong> has invited you to his list: {{this._list}}
+        </p>
+        <button type="submit" name="accept" value="true">Accept</button>
+        <button type="submit" name="decline" value="false">Decline</button>
+    </div>
+</div>

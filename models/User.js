@@ -7,7 +7,7 @@ const userSchema = new Schema({
   password: String,
   //image: String,
   confirmationCode: String,
-  //_list: [],
+  //_list: [{type:[Schema.Types.ObjectId], ref: 'List'}],
   status: {type: Boolean, default: false}
 }, {
   timestamps: {

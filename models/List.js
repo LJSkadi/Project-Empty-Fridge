@@ -4,8 +4,8 @@ const Schema   = mongoose.Schema;
 const   listSchema = new Schema({
   name:    {type: String, default: `New List from ${(new Date().getDate())} - ${(new Date().getMonth())+1} - ${(new Date().getFullYear())}`},
   _creator: {type: Schema.Types.ObjectId , ref: 'User', required: true},
-  _members: {type:[Schema.Types.ObjectId], ref: 'User'},
-  _items: {type:[Schema.Types.ObjectId], ref: 'Item'},
+  _members: [{type:[Schema.Types.ObjectId], ref: 'User'}],
+  _items: [{type:[Schema.Types.ObjectId], ref: 'Item'}],
 }, {
   timestamps: {
     createdAt: 'created_at',

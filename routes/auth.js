@@ -18,6 +18,7 @@ let transporter = nodemailer.createTransport({
   }
 })
 
+//#region SIGNUP
 //#region GET /signup
 authRoutes.get("/signup", (req, res, next) => {
   res.render("users/signup");
