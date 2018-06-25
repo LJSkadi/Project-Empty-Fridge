@@ -70,7 +70,7 @@ authRoutes.post("/login", passport.authenticate("local", {
   const userId = req.user._id;
   res.redirect(`/user/${userId}`); //  we redirect logged in user to /user/userId (his/her profile)
 });
-
+//#endregion
 authRoutes.use( (req, res, next) => {
   if ( req.isAuthenticated() ) {
     console.log( "YES YOU ARE LOGGED IN" );
@@ -83,7 +83,6 @@ authRoutes.use( (req, res, next) => {
 })
 //#endregion
 //#endregion
-
 
 //#region GET /Profilpage
 authRoutes.get('/user/:userId',(req, res, next) => {
