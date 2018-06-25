@@ -49,7 +49,8 @@ privateRoutes.get('/new-list', (req, res, next) => {
 
 //#region POST/new-list
 privateRoutes.post('/new-list', (req, res, next) => {
-  let listName = req.body.listname;
+  
+  let listName = (req.body.listname==="") ? undefined : req.body.listname;
   let creator = req.user._id;
   List.create({ name: listName, _creator: creator })
     .then(list => {
