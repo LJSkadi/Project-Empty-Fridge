@@ -7,13 +7,14 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 
+//#region SIGNUP
 //#region GET /signup
 authRoutes.get("/signup", (req, res, next) => {
   res.render("users/signup");
 });
 //#endregion
 
-
+//#region POST /signup
 authRoutes.post("/signup", (req, res, next) => {
   const username = req.body.username;
   const email = req.body.email;
@@ -50,22 +51,16 @@ authRoutes.post("/signup", (req, res, next) => {
     });
   });
 });
+//#endregion
+//#endregion
 
-function checkStatus() {
-  return function(req, res, next) {
-    if (req.isAuthenticated() && req.user.status) {
-      return next();
-    } else {
-      res.redirect('users/login')
-    }
-  }
-}
-
+//#region LOGIN
+//#region GET /login
 authRoutes.get("/login", (req, res, next) => {
   res.render("users/login", { "message": req.flash("error") });
 });
 
-
+//#region POST /login
 authRoutes.post("/login", passport.authenticate("local", {
   //successRedirect: "/", we overwrite this Passport command to redirect logged in user where we want
   failureRedirect: "/login",
@@ -86,7 +81,11 @@ authRoutes.use( (req, res, next) => {
     return;
   }
 })
+//#endregion
+//#endregion
 
+
+//#region GET /Profilpage
 authRoutes.get('/user/:userId',(req, res, next) => {
   User.findOne( { "_id": req.params.userId } )
   .then( user => {
@@ -94,12 +93,13 @@ authRoutes.get('/user/:userId',(req, res, next) => {
   } )
   .catch( err => { throw err } );
 });
+//#endregion
 
-
-
+//#region GET /logout
 authRoutes.get("/logout", (req, res) => {
   req.logout();
   res.redirect("/");
 });
+//#endregion
 
 module.exports = authRoutes;
