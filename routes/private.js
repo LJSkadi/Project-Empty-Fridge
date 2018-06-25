@@ -37,7 +37,7 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
   let listId = req.params.listId;
   List.findById(listId)
     .then(list => {
-      res.render('list', list )
+      res.render('lists/list-details', list )
     })
     .catch( err => { throw err })
 });
