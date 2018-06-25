@@ -74,6 +74,12 @@ app.use(session({
 app.use(flash());
 require('./passport')(app);
 
+// check if user is logged in and create a global variable for views
+app.use( (req, res, next) => {
+  if (req.isAuthenticated() && req.user)
+    res.locals.currentUser = req.user;
+  next();
+});
 
 const index = require('./routes/index');
 app.use('/', index);
