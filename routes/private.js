@@ -25,21 +25,6 @@ privateRoutes.get('/user/:userId',(req, res, next) => {
 //#endregion
 
 
-//This is an alternative solution
-// privateRoutes.get('/user/:userId', (req, res, next) => {
-//   User.findOne({ "_id": req.params.userId })
-//     .then(user => {
-//       List.find( { _creator : req.params.userId } )
-//         .then(lists => {
-//           res.render('users/profile', { user, lists })
-//         }
-//         )
-//         .catch(err => { throw err })
-//    })
-//     .catch(err => 
-//       { throw err });
-// });
-
 //#region CREATE LIST
 //#region GET/new-list
 privateRoutes.get('/new-list', (req, res, next) => {
@@ -68,11 +53,43 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
   let listId = req.params.listId;
   List.findById(listId)
     .then(list => {
+      console.log( list );
       res.render('lists/list-details', list )
     })
     .catch( err => { throw err })
 });
 
+//#endregion
+
+
+//#region POST/add-new-item
+privateRoutes.post('/add-new-item', (req, res, next) => {
+  const { listId, newItemInput }  = req.body;
+  const user = req.user;
+  const newItem = {
+    _creator: user._id,
+    content: newItemInput
+  }
+  List.findById( listId )
+  .then( list =>{
+    console.log( "LIST IS --->", list );
+    
+    list.items.unshift( newItem );
+    console.log( "LIST ITEMS ------>", list.items );
+    
+    list.save( err => {
+      if ( err ) {
+        console.log( "ERROR updating List ---->", err );
+      res.redirect( `/list/${list._id}` );
+      } else {
+        res.redirect(`/list/${list._id}`);
+      }
+    } );
+  })
+  .catch( err => { throw err } );
+
+
+});
 //#endregion
 
 //#region GET /logout
