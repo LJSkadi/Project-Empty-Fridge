@@ -99,3 +99,4 @@ privateRoutes.get("/logout", (req, res) => {
 module.exports = privateRoutes;
 
 
+//Item.findByIdAndUpdate(req.params._id, { status: 'CLOSED' })

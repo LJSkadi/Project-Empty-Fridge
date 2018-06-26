@@ -5,7 +5,9 @@
     <h2>Lists</h2>
     {{#each lists}}
     <ul>
-      <li>"{{this.name}}"</li>
+      <li>
+       <a href="/list/{{this._id}}">"{{this.name}}"</a>
+       </li>
     </ul>
     {{/each}}
     <a href="/new-list" class="btn btn-success">Create New List</a>
