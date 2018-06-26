@@ -88,7 +88,7 @@ privateRoutes.post('/add-new-item', (req, res, next) => {
   })
   .catch( err => { throw err } );
 
-
+  
 });
 //#endregion
 
@@ -101,5 +101,32 @@ privateRoutes.get("/logout", (req, res) => {
 
 module.exports = privateRoutes;
 
+//#region POST/add-new-item
+privateRoutes.post('/add-new-item', (req, res, next) => {
+  const { listId, newItemInput }  = req.body;
+  const user = req.user;
+  const newItem = {
+    _creator: user._id,
+    content: newItemInput
+  }
+  List.findById( listId )
+  .then( list =>{
+    console.log( "LIST IS --->", list );
+    
+    list.items.unshift( newItem );
+    console.log( "LIST ITEMS ------>", list.items );
+    
+    list.save( err => {
+      if ( err ) {
+        console.log( "ERROR updating List ---->", err );
+      res.redirect( `/list/${list._id}` );
+      } else {
+        res.redirect(`/list/${list._id}`);
+      }
+    } );
+  })
+  .catch( err => { throw err } );
 
+
+});
 //Item.findByIdAndUpdate(req.params._id, { status: 'CLOSED' })
