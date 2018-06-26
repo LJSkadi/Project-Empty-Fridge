@@ -6,7 +6,9 @@
     {{#if _items}}
     <ul>
       {{#each _items}}
-        <li> {{ this.content }} </li>
+        <li>
+          <strong>{{this.content}}</strong> 
+        </li>
       {{/each}}
     </ul>
     {{else}}
@@ -24,14 +26,16 @@
   </div>
 
   <div class="col-md-4">
-
-    <form id="search" action="/search-user" method="post">
+    <div id="search-result">
+      {{#if emails}}
+      {{/if}}
+    </div>
+    <form action="/search-user" method="post">
       <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" name="searched-email" id="searched-email" placeholder="Enter email">
+        <input type="email" class="form-control" name="searched-email" placeholder="Search a user user@user.com">
       </div>
       <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Search</button>
       </div>
     </form>
 

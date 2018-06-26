@@ -25,6 +25,17 @@ privateRoutes.get('/user/:userId',(req, res, next) => {
 });
 //#endregion
 
+//#region POST /search-user
+privateRoutes.post('/search-user', (req, res, next) => {
+  const email = req.body.email;
+  User.find({ email: email })
+  .then( users => {
+    console.log( "The LIST of the USERS --->", users );
+  })
+  .catch( err => { throw err } );
+});
+//#endregion
+
 
 //#region CREATE LIST
 //#region GET/new-list
