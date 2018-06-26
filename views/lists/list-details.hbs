@@ -3,9 +3,9 @@
 <div class="row">
   <div class="col-md-8">
     <h2>Items</h2>
-    {{#if items}}
+    {{#if _items}}
     <ul>
-      {{#each item}}
+      {{#each _items}}
         <li> {{ this.content }} </li>
       {{/each}}
     </ul>
