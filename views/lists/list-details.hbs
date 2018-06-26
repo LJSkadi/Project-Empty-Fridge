@@ -1,16 +1,33 @@
-<h1>{{ name }} <small>details</small></h1>
-
+<h1>{{ list.name }} <small>details</small></h1>
+{{this.openItems}}
 <div class="row">
   <div class="col-md-8">
     <h2>Items</h2>
-    {{#if _items}}
+    {{#if openItems}}
     <ul>
-      {{#each _items}}
-        <li>
-          <strong>{{this.content}}</strong> 
+      {{#each openItems}}
+        <li> 
+          <a href="/delete-item/{{this._id}}">delete</a>
+          {{ this.content }} 
         </li>
       {{/each}}
     </ul>
+    
+    <h2>Closed Items</h2>
+    {{#if closedItems}}
+    <ul>
+      {{#each closedItems}}
+        <li> 
+          <a href="/reactivate-item/{{this._id}}">reactivate</a>
+          {{ this.content }} 
+        </li>
+      {{/each}}
+       {{else}}
+      <p>All items are open. Be a nice person and close.</p>
+    {{/if}}
+    </ul>
+
+
     {{else}}
       <p>You're list is empty. Add some content.</p>
     {{/if}}
@@ -19,7 +36,7 @@
         <input type="text" class="form-control" name="newItemInput" placeholder="Enter item">
       </div>
       <div class="form-group">
-        <input name="listId" type="hidden" value="{{_id}}">
+        <input name="listId" type="hidden" value="{{list._id}}">
       </div>
       <button type="submit" class="btn btn-success mb-2">Add Item</button>
     </form>
