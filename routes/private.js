@@ -1,8 +1,9 @@
-const express = require("express");
-const passport = require('passport');
-const User = require("../models/User");
-const List = require("../models/List");
-const nodemailer = require('nodemailer');
+const express       = require("express");
+const User          = require("../models/User");
+const List          = require("../models/List");
+const Item          = require('../models/Item');
+const passport      = require('passport');
+const nodemailer    = require('nodemailer');
 
 const privateRoutes = express.Router();
 
@@ -52,11 +53,12 @@ privateRoutes.post('/new-list', (req, res, next) => {
 privateRoutes.get('/list/:listId', (req, res, next) => {
   let listId = req.params.listId;
   List.findById(listId)
-    .then(list => {
-      console.log( list );
-      res.render('lists/list-details', list )
-    })
-    .catch( err => { throw err })
+  .populate( '_items' )
+  .then(list => {
+    console.log( list );
+    res.render('lists/list-details', list )
+  })
+  .catch( err => { throw err })
 });
 
 //#endregion
@@ -66,29 +68,24 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
 privateRoutes.post('/add-new-item', (req, res, next) => {
   const { listId, newItemInput }  = req.body;
   const user = req.user;
-  const newItem = {
+  
+  const newItem = new Item( {
     _creator: user._id,
+    _list: listId,
     content: newItemInput
-  }
-  List.findById( listId )
-  .then( list =>{
-    console.log( "LIST IS --->", list );
-    
-    list.items.unshift( newItem );
-    console.log( "LIST ITEMS ------>", list.items );
-    
-    list.save( err => {
-      if ( err ) {
-        console.log( "ERROR updating List ---->", err );
-      res.redirect( `/list/${list._id}` );
-      } else {
-        res.redirect(`/list/${list._id}`);
-      }
-    } );
+  });
+
+  newItem.save()
+  .then( createdItem => {
+    console.log( "NEW ITEM CREATED --->", createdItem );
+
+    List.findByIdAndUpdate( listId, { $push: { _items: createdItem._id }}, { new: true } )
+    .then(updatedList => {
+      console.log( "LIST UPDATED --->", updatedList );
+      res.redirect(`/list/${listId}`);
+    })
   })
-  .catch( err => { throw err } );
-
-
+  .catch( err => { console.log( "Error creating the NEW ITEM and updating LIST", err ) });
 });
 //#endregion
 
