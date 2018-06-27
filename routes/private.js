@@ -9,7 +9,27 @@ const bcrypt        = require('bcrypt');
 
 const privateRoutes = express.Router();
 
+function isIncluded( role ) {
+ return function(req, res, next) {
+  let listId = (req.params.listId) ? req.params.listId : req.body.listId ;
+  List.findById(listId)
+  .then ( list => {
+    if ( role==="_creator"){
+      console.log("I'm the creator")
+      list[role] === req.user._id
+      return next()
+      }else{
+      console.log("I'm a member")
+      list[role].includes(req.user._id)
+      return next(); 
+      } 
+  })
+ .catch ( err => { throw err } )
+   }
+}
 
+const isCreator  = isIncluded( "_creator" );
+const isMember = isIncluded( "_members" );
 
 //#region LIST
 //#region GET /Profilpage
@@ -98,7 +118,7 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
 //#endregion
 
 //#region POST/add-new-item
-privateRoutes.post('/add-new-item', (req, res, next) => {
+privateRoutes.post('/list/:listId/add-new-item', isMember, (req, res, next) => {
   const { listId, newItemInput }  = req.body;
   const user = req.user;
   
@@ -123,7 +143,7 @@ privateRoutes.post('/add-new-item', (req, res, next) => {
 //#endregion
 
 //#region GET/delete-item
-privateRoutes.get('/delete-item/:itemId', (req, res, next) => {
+privateRoutes.get('/list/:listId/delete-item/:itemId', isMember, (req, res, next) => {
   Item.findByIdAndUpdate(req.params.itemId, { status: 'CLOSED' }, {new: true})
   .populate('_list')
   .then( updatedItem => {
@@ -133,7 +153,7 @@ privateRoutes.get('/delete-item/:itemId', (req, res, next) => {
 })
 
 //#region GET/reactivate-item
-privateRoutes.get('/reactivate-item/:itemId', (req, res, next) => {
+privateRoutes.get('/list/:listId/reactivate-item/:itemId', isMember, (req, res, next) => {
   Item.findByIdAndUpdate(req.params.itemId, { status: 'OPEN' }, {new: true})
   .populate('_list')
   .then( updatedItem => {
@@ -152,7 +172,7 @@ let transporter = nodemailer.createTransport({
 })
 
 //#region POST /create-invitation
-privateRoutes.post("/create-invitation", (req, res, next) => {
+privateRoutes.post("/create-invitation", isCreator, (req, res, next) => {
   const sendingUser = req.user;
   const invitedUserId = req.body.invitedUserId;
   const listId = req.body.listId;
@@ -245,12 +265,12 @@ privateRoutes.get("/logout", (req, res) => {
 //#endregion
 
 //#region GET/delete-list
-privateRoutes.get('/delete-list/:listId', (req, res, next) => {
+privateRoutes.get('/delete-list/:listId', isCreator, (req, res, next) => {
   let userId = req.user._id;
   let listId = req.params.listId;
   List.findById(listId)
   .then( list => {
-    if (`${userId}` == `${list._creator}`){
+    //if (`${userId}` == `${list._creator}`){
       Item.deleteMany({_list: listId})
       .then( itemsDeleted => {
         List.findByIdAndRemove(req.params.listId)
@@ -261,48 +281,12 @@ privateRoutes.get('/delete-list/:listId', (req, res, next) => {
         })
       })
       .catch( err => { throw err } )
-    }else{
-      res.redirect(`/user/${userId}`)
-    }
+    //}else{
+    //  res.redirect(`/user/${userId}`)
+    //}
   })
   .catch( err => { throw err } )
 })
 
 module.exports = privateRoutes;
 
-//privateRoutes.get('/', function (req, res, next) {
-//   if (req.isAuthenticated() && list._member === userId ) {
-//       return next();
-//  next();
-//})
-
-// function isIncluded(userId, list, role) {
-//   if (req.isAuthenticated() && list.role === userId ) {
-//       return next();
-// }
-//}
-
-//   return function(req, res, next) {
-//     if (req.isAuthenticated() && element._creator === userId ) {
-//       return next();
-//     }
-//   }
-// }
-
-// const isCreator  = isIncluded(req.user._id, list, _creator);
-// const isMember = isIncluded(req.user._id, list), _members;
-
-// //* GET method to show the signup form
-// privateRoutes.get('/delete-list/:listId', checkListCreator, (req, res, next) => {
-//   Item.deleteMany({_list: req.params.listId})
-//   .then( itemsDeleted => {
-//     console.log("I'm here")
-//     List.findByIdAndRemove(req.params.listId)
-//     .then( listToDelete => {
-//       let message = "Your list is deleted successfully";
-//       let userId = req.user._id;
-//       res.redirect(`/user/${userId}`)
-//     })
-//   })
-//   .catch( err => { throw err } )
-// })
