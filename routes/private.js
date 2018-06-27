@@ -261,7 +261,8 @@ privateRoutes.get('/delete-list/:listId', (req, res, next) => {
 
 module.exports = privateRoutes;
 
-// function checkCreator(userId, element) {
+
+// function checkCreator(userId, creator) {
 //   return function(req, res, next) {
 //     if (req.isAuthenticated() && element._creator === userId ) {
 //       return next();
