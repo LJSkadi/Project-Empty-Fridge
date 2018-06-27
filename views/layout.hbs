@@ -12,7 +12,7 @@
   </head>
   <body>
 
-<nav class="navbar navbar-expand navbar-dark bg-primary">
+<nav class="navbar navbar-expand-sm navbar-dark bg-primary">
     <!--<a class="navbar-brand" href="/">
     <img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" alt="">
   </a> -->
@@ -25,7 +25,7 @@
     <ul class="navbar-nav">
         {{#if currentUser}}
       <li class="nav-item active">
-        <a class="nav-link" href="/user/{{currentUser._id}}">My Fridge Lists</a>
+        <a class="nav-link" href="/user/{{currentUser._id}}">{{currentUser.username}}'s Fridge Lists</a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="/logout">Log out</a>

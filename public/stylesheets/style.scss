@@ -1,17 +1,13 @@
 
+$primary: #33ffbb;
 @import "node_modules/bootstrap/scss/bootstrap";
-//$primary: #66ffcc;
 
-.navbar-brand{font-family:'Niconne', cursive;} 
+.navbar-brand{font-family:'Pinyon Script', cursive;} 
 
 
 
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  font-family: 'Niconne', cursive;
-  font-family: 'Pinyon Script', cursive;
-  font-family: 'Nunito', sans-serif;
+  font: 14px 'Nunito', sans-serif;
 }
 
 a {

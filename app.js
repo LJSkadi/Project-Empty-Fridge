@@ -76,7 +76,7 @@ require('./passport')(app);
 app.use( (req, res, next) => {
   if (req.isAuthenticated() && req.user)
     res.locals.currentUser = req.user;
-    //res.locals.username = req.user.username;
+    res.locals.username = req.user.username;
   next();
 });
 
