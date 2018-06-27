@@ -11,7 +11,7 @@
     <ul>
       {{#each openItems}}
         <li> 
-          <a href="/delete-item/{{this._id}}">delete</a>
+          <a href="/list/{{../list._id}}/delete-item/{{this._id}}">delete</a>
           {{ this.content }} 
         </li>
       {{/each}}
@@ -25,7 +25,7 @@
     <ul>
       {{#each closedItems}}
         <li> 
-          <a href="/reactivate-item/{{this._id}}">reactivate</a>
+          <a href="/list/{{../list._id}}/reactivate-item/{{this._id}}">reactivate</a>
           {{ this.content }} 
         </li>
       {{/each}}
@@ -34,7 +34,7 @@
     {{/if}}
     </ul>
 
-    <form class="form-inline" action="/add-new-item" method="post">
+    <form class="form-inline" action="/list/{{list._id}}/add-new-item" method="post">
       <div class="form-group mb-2">
         <input type="text" class="form-control" name="newItemInput" placeholder="Enter item">
       </div>
