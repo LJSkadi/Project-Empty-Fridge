@@ -66,7 +66,7 @@ privateRoutes.post('/new-list', (req, res, next) => {
   
   let listName = (req.body.listname==="") ? undefined : req.body.listname;
   let creator = req.user._id;
-  List.create({ name: listName, _creator: creator })
+  List.create({ name: listName, _creator: creator, _members: [creator] })
     .then(list => {
       res.redirect(`/list/${list._id}`)
     })
@@ -267,8 +267,18 @@ privateRoutes.get('/delete-list/:listId', (req, res, next) => {
 
 module.exports = privateRoutes;
 
+//privateRoutes.get('/', function (req, res, next) {
+//   if (req.isAuthenticated() && list._member === userId ) {
+//       return next();
+//  next();
+//})
 
-// function checkCreator(userId, creator) {
+// function isIncluded(userId, list, role) {
+//   if (req.isAuthenticated() && list.role === userId ) {
+//       return next();
+// }
+//}
+
 //   return function(req, res, next) {
 //     if (req.isAuthenticated() && element._creator === userId ) {
 //       return next();
@@ -276,8 +286,8 @@ module.exports = privateRoutes;
 //   }
 // }
 
-// const checkListCreator  = checkCreator(req.user._id, list);
-// const checkItemCreator = checkCreator(req.user._id, item);
+// const isCreator  = isIncluded(req.user._id, list, _creator);
+// const isMember = isIncluded(req.user._id, list), _members;
 
 // //* GET method to show the signup form
 // privateRoutes.get('/delete-list/:listId', checkListCreator, (req, res, next) => {
