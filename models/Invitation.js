@@ -12,7 +12,8 @@ const   invitationSchema = new Schema({
   timestamps: {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
-  }
+  },
+  usePushEach: true
 });
 
 const Invitation = mongoose.model('Invitation', invitationSchema);

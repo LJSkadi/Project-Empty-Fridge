@@ -15,7 +15,8 @@ const   itemSchema = new Schema({
   timestamps: {
     createdAt: 'created_at',
     updatedAt: 'updated_at'
-  }
+  },
+  usePushEach: true
 });
 
 const Item = mongoose.model('Item', itemSchema);

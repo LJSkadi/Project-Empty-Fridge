@@ -171,28 +171,58 @@ privateRoutes.post("/create-invitation", (req, res, next) => {
     console.log( "You want to invite on THIS LIST --->", sharedList );
 
     let newInvitation = new Invitation({
-      _sendingUser: sendingUser._id,
-      _receivingUser: invitedUser._id,
+      receivingUser: {
+        _id: invitedUser._id,
+        username: invitedUser.username,
+        email: invitedUser.email
+      },
       _list: listId,
       confirmationCode: bcrypt.hashSync( invitedUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join(''),
       refuseCode: bcrypt.hashSync( sendingUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join('')
     });
+    console.log( "NEW INVITATION created --->", newInvitation );
 
-    console.log("LIST INVITATIONS --->", sharedList._invitations);
-    // sharedList.save((err, updatedList) => {
-    //   if ( err ) {
-    //     console.log( err );
-    //   } else {
-    //     console.log( "Invitation reference inside list done!", updatedList );
-    //   }
-    // })
+    // push invitation reference into list
+    sharedList._invitations.push( newInvitation._id );
+    // update the list
+    sharedList.save((err, updatedList) => {
+      if ( err ) {
+        console.log( err );
+      } else {
+        console.log( "Invitation reference inside list done!", updatedList );
+    
+        // email content for the new user with a link to confirmation code
+        const subject = `${sendingUser.email} is inviting you to join a list on emptyfridge.com`;
+        const message = `<strong>Hi ${receivingUser.username}</strong>, <strong>${sendingUser.username}</strong> is inviting you to join his/her <strong>${sharedList.name} list</strong> on our platform <strong><a href="http://localhost:3000/">Empty Fridge</a></strong>.
+        You can <a href='http://localhost:3000/list/${sharedList._id}/confirm/${newInvitation.confirmationCode}'>confirm</a> or <a href='http://localhost:3000/list/${sharedList._id}/declin/${newInvitation.refuseCode}'>declin</a> this invitation, clicking on these links: <b><a href='http://localhost:3000/list/${sharedList._id}/confirm/${newInvitation.confirmationCode}'>Accept Invitation</a></b> --- <a href='http://localhost:3000/list/${sharedList._id}/declin/${newInvitation.refuseCode}'>Declin Invitation</a>`;
+    
+        newInvitation.save( (err) => {
+          if ( err ) {
+            res.render("lists/list-details", { message: "Something went wrong" });
+          } else {
+            transporter.sendMail({
+              from: '"Empty Fridge Project 👻" <empty.fridge@gmail.com>',
+              to: email, 
+              subject: subject, 
+              text: message,
+              html: `${message}`
+            })
+            .then(info => {
+              console.log( "EMAIL SENT!!!", info );
+              console.log( "Rendering list page." )
+              res.redirect(`/list/${sharedList._id}`);
+            })
+            .catch(error => {
+              console.log("ERROR CREATING USER: ", error);
+              console.log( "Redirecting new user to login page." )
+              res.redirect(`/list/${sharedList._id}`);
+            });
+            
+          }
+        });
+      }
+    })
 
-    console.log( "NEW INVITATION --->", newInvitation );
-
-    // email content for the new user with a link to confirmation code
-    const subject = `${sendingUser.email} is inviting you to join a list on emptyfridge.com`;
-    const message = `<strong>Hi ${_receivingUser.username}</strong>, <strong>${sendingUser.username}</strong> is inviting you to join his/her <strong>${sharedList.name} list</strong> on our platform <strong><a href="http://localhost:3000/">Empty Fridge</a></strong>.
-    You can <a href='http://localhost:3000/list/${sharedList._id}/confirm/${newInvitation.confirmationCode}'>confirm</a> or <a href='http://localhost:3000/list/${sharedList._id}/declin/${newInvitation.refuseCode}'>declin</a> this invitation, clicking on these links: <b><a href='http://localhost:3000/list/${sharedList._id}/confirm/${newInvitation.confirmationCode}'>Accept Invitation</a></b> --- <a href='http://localhost:3000/list/${sharedList._id}/declin/${newInvitation.refuseCode}'>Declin Invitation</a>`;
   })
   .catch( err => {
     console.log("PROBLEM CREATING INVITATION --->", err );
@@ -200,31 +230,6 @@ privateRoutes.post("/create-invitation", (req, res, next) => {
 
 
       
-  //   newUser.save( (err) => {
-  //     if (err) {
-  //       res.render("users/signup", { message: "Something went wrong" });
-  //     } else {
-  //       transporter.sendMail({
-  //         from: '"Empty Fridge Project 👻" <empty.fridge@gmail.com>',
-  //         to: email, 
-  //         subject: subject, 
-  //         text: message,
-  //         html: `<b>Hi ${username}, ${message} <a href='http://localhost:3000/confirm/${confirmationCode}'>confirmation link</a></b>`
-  //       })
-  //       .then(info => {
-  //         console.log( "EMAIL SENT!!!", info );
-  //         console.log( "Redirecting new user to login page." )
-  //         res.redirect("/login");
-  //       })
-  //       .catch(error => {
-  //         console.log("ERROR CREATING USER: ", error);
-  //         console.log( "Redirecting new user to login page." )
-  //         res.redirect("/login");
-  //       });
-        
-  //     }
-  //   });
-  // });
 });
 //#endregion
 
