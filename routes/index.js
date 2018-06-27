@@ -27,14 +27,22 @@ router.get('/invitation/:invitationId/confirm/:confirmationCode', (req, res, nex
     .then( () =>{
       // adding member to list after compare confirmation code
       invitation._list._members.push( invitation.receivingUser.id );
+      // remove pending invitation from list
+      invitation._list._invitations.pull( { _id: invitation._id } );
       console.log( "NOW LIST HAS A NEW MEMBER --->", invitation._list );
-      // update list after adding member
+      // update list after adding member and removing pending invitation
       invitation._list.save( (err, updatedList) => {
         if ( err ) {
           console.log( "ERROR updating list after adding member --->", err );
         } else {
           console.log( "Member added to list", updatedList );
-          res.redirect(`list/${invitation._list._id}`);
+          // redirecting after adding member to list
+          Invitation.findByIdAndRemove( invitation._id )
+          .then( () => {
+            console.log( "Member confirmed!!! Invitation deleted." )
+            res.redirect('/');
+          } )
+          .catch( err => { throw err } );
         }
       })
     })
