@@ -6298,4 +6298,7 @@ a {
 #fonts {
   font-family: 'Nunito', sans-serif; }
 
+.pending-invitation {
+  line-height: 25px; }
+
 /*# sourceMappingURL=style.css.map */

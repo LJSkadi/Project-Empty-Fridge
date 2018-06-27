@@ -5,7 +5,7 @@
         </li>
     
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-md-6">
     <h2>Items</h2>
     {{#if openItems}}
     <ul>
@@ -45,8 +45,39 @@
     </form>
   </div>
 
+  <div class="col-md-3">
+    
+    <!-- MEMBERS -->
+    {{#if listMembers}}
+      <h3>List members</h3>
+      <ul>
+        {{#each listMembers}}
+          <li>{{this.username}}</li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <h3>This list has no <em>members</em></h3>
+    {{/if}}
+
+    <!-- PENDING INVITATIONS -->
+    {{#if pendingInvitations}}
+      <h3>Pending Invitations</h3>
+      {{#each pendingInvitations}}
+        <div class="badge badge-info pending-invitation mt-2">
+          <strong>{{this.receivingUser.username}}</strong>
+          <a href="/invitation/{{this._id}}/decline/{{this.refuseCode}}" class="close">
+           <span>&times;</span>
+          </a>
+        </div>
+      {{/each}}
+    {{else}}
+      <h3>This list has no <em>pending invitations</em></h3>
+    {{/if}}
+
+  </div>
+
   <!-- SEARCH USERS -->
-  <div class="col-md-4">
+  <div class="col-md-3">
     <form class="form-inline" action="/search-user" method="post">
       <div class="form-group mb-2">
         <input type="email" class="form-control" name="searchedEmail" placeholder="Search for email">

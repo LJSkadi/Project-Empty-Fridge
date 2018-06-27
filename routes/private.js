@@ -84,10 +84,14 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
 
   List.findById(listId)
   .populate( '_items' )
+  .populate( '_members' )
+  .populate( '_invitations' )
   .then(list => {
-    const openItems = list._items.filter((item) => item.status ==='OPEN')
-    const closedItems = list._items.filter((item) => item.status ==='CLOSED')
-    res.render('lists/list-details', {list: list, openItems: openItems, closedItems:closedItems} )
+    const openItems = list._items.filter((item) => item.status ==='OPEN');
+    const closedItems = list._items.filter((item) => item.status ==='CLOSED');
+    const listMembers = list._members;
+    const pendingInvitations = list._invitations;
+    res.render('lists/list-details', { list: list, openItems: openItems, closedItems:closedItems, listMembers: listMembers, pendingInvitations: pendingInvitations } )
   })
   .catch( err => { throw err })
 });
@@ -180,7 +184,6 @@ privateRoutes.post("/create-invitation", (req, res, next) => {
       confirmationCode: bcrypt.hashSync( invitedUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join(''),
       refuseCode: bcrypt.hashSync( sendingUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join('')
     });
-    console.log( "NEW INVITATION created --->", newInvitation );
 
     // push invitation reference into list
     sharedList._invitations.push( newInvitation._id );

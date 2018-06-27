@@ -52,4 +52,40 @@ router.get('/invitation/:invitationId/confirm/:confirmationCode', (req, res, nex
 });
 //#endregion
 
+
+//#region DECLINE invitation
+router.get('/invitation/:invitationId/decline/:refuseCode', (req, res, next) => {
+  //console.log( req.params );
+  const invitationId = req.params.invitationId;
+  const passedRefuseCode = req.params.refuseCode;
+  Invitation.findById( invitationId )
+  .populate( '_list' )
+  .then( invitation => {
+    bcrypt.compare( passedRefuseCode, invitation.refuseCode)
+    .then( () =>{
+      // remove pending invitation from list
+      invitation._list._invitations.pull( { _id: invitation._id } );
+      
+      // update list after adding member and removing pending invitation
+      invitation._list.save( (err, updatedList) => {
+        if ( err ) {
+          console.log( "ERROR updating list after decline invitation --->", err );
+        } else {
+          console.log( "Invitation declined", updatedList );
+          // erasing invitation after decline invitation
+          Invitation.findByIdAndRemove( invitation._id )
+          .then( () => {
+            console.log( "Member declined!!! Invitation deleted." )
+            res.redirect(`/list/${updatedList._id}`);
+          } )
+          .catch( err => { throw err } );
+        }
+      })
+    })
+    .catch( err => { throw err } )
+  })
+  .catch( err => { throw err })
+});
+//#endregion
+
 module.exports = router;
