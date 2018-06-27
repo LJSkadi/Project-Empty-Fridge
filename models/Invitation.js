@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 const Schema   = mongoose.Schema;
 
 const   invitationSchema = new Schema({
-  _sendingUser:    {type: Schema.Types.ObjectId , ref: 'User'},
-  _receivingUser:  {type: Schema.Types.ObjectId , ref: 'User', required: true},
+  _sendingUser:    { 
+      _id:      {type: Schema.Types.ObjectId},
+      username: {type: String}
+    },
+  _receivingUser:  {
+    _id:      {type: Schema.Types.ObjectId},
+    username: {type: String}
+  },
   _list: {type: Schema.Types.ObjectId , ref: 'List', required: true},
   confirmationCode: String,
   refuseCode: String,
