@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
 });
 
 //#region CONFIRM invitation
-privateRoutes.get('/invitation/:invitationId/confirm/:confirmationCode', (req, res, next) => {
+router.get('/invitation/:invitationId/confirm/:confirmationCode', (req, res, next) => {
   //console.log( req.params );
   const invitationId = req.params.invitationId;
   const passedConfirmationCode = req.params.confirmationCode;
