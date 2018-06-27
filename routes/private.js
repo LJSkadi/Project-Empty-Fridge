@@ -267,30 +267,22 @@ privateRoutes.get('/delete-list/:listId', (req, res, next) => {
 
 module.exports = privateRoutes;
 
-//privateRoutes.get('/', function (req, res, next) {
-//   if (req.isAuthenticated() && list._member === userId ) {
-//       return next();
-//  next();
-//})
 
 // function isIncluded(userId, list, role) {
+//  return function(req, res, next) {
 //   if (req.isAuthenticated() && list.role === userId ) {
 //       return next();
-// }
+//        } else {
+  //       res.redirect('/login')
+  //     }
+//    }
 //}
-
-//   return function(req, res, next) {
-//     if (req.isAuthenticated() && element._creator === userId ) {
-//       return next();
-//     }
-//   }
-// }
 
 // const isCreator  = isIncluded(req.user._id, list, _creator);
 // const isMember = isIncluded(req.user._id, list), _members;
 
 // //* GET method to show the signup form
-// privateRoutes.get('/delete-list/:listId', checkListCreator, (req, res, next) => {
+// privateRoutes.get('/delete-list/:listId', isCreator, (req, res, next) => {
 //   Item.deleteMany({_list: req.params.listId})
 //   .then( itemsDeleted => {
 //     console.log("I'm here")
