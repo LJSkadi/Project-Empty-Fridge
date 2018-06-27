@@ -8,19 +8,49 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link rel='stylesheet' href='/stylesheets/style.css' />
-    <title>{{title}}</title>
+    <title id="title">{{title}}</title>
   </head>
   <body>
-    <nav>
-      <a href="/">Home</a> -
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light primary">
+    <!--<a class="navbar-brand" href="/">
+    <img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" alt="">
+  </a> -->
+
+  <a class="navbar-brand" href="/">Empty<br>Fridge</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+        {{#if currentUser}}
+      <li class="nav-item active">
+        <a class="nav-link" href="/user/{{currentUser._id}}">My Fridge Lists</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="/logout">Log out</a>
+      </li>
+       {{else}}
+ <li class="nav-item active">
+        <a class="nav-link" href="/signup">Sign up</a>
+      </li>
+ <li class="nav-item active">
+        <a class="nav-link" href="/login">Log in</a>
+      </li>
+            {{/if}}
+    </ul>
+  </div>
+</nav>
+
+     <!-- <a href="/">Home</a>
       {{#if currentUser}}
-        <a href="/user/{{currentUser._id}}">Dashboard</a> -
+        <a href="/user/{{currentUser._id}}">My Fridge Lists</a>
         <a href="/logout">Log out</a>
       {{else}}
-        <a href="/signup">Sign up</a> -
-        <a href="/login">Log in</a>
+        <a href="/signup">Sign up</a>
+        <a id="fonts" href="/login">Log in</a>
       {{/if}}
-    </nav>
+    </nav>-->
 
     {{{body}}}
 
