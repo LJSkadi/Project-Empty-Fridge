@@ -178,12 +178,21 @@ privateRoutes.post("/create-invitation", (req, res, next) => {
       refuseCode: bcrypt.hashSync( sendingUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join('')
     });
 
+    console.log("LIST INVITATIONS --->", sharedList._invitations);
+    // sharedList.save((err, updatedList) => {
+    //   if ( err ) {
+    //     console.log( err );
+    //   } else {
+    //     console.log( "Invitation reference inside list done!", updatedList );
+    //   }
+    // })
+
     console.log( "NEW INVITATION --->", newInvitation );
 
-    // // email content for the new user with a link to confirmation code
-    // const subject = `${sendingUser.email} is inviting you to join a list on emptyfridge.com`;
-    // const message = `<strong>Hi ${_receivingUser.username}</strong>, <strong>${sendingUser.username}</strong> is inviting you to join his/her <strong>${sharedList.name} list</strong> on our platform <strong><a href="http://localhost:3000/">Empty Fridge</a></strong>.
-    // You can <a href='http://localhost:3000/confirm-invitation/${newInvitation.confirmationCode}'>confirm</a> or <a href='http://localhost:3000/declin-invitation/${newInvitation.refuseCode}'>declin</a> this invitation, clicking on these links: <b><a href='http://localhost:3000/confirm-invitation/${newInvitation.confirmationCode}'>Accept Invitation</a></b> --- <a href='http://localhost:3000/declin-invitation/${newInvitation.refuseCode}'>Declin Invitation</a>`;
+    // email content for the new user with a link to confirmation code
+    const subject = `${sendingUser.email} is inviting you to join a list on emptyfridge.com`;
+    const message = `<strong>Hi ${_receivingUser.username}</strong>, <strong>${sendingUser.username}</strong> is inviting you to join his/her <strong>${sharedList.name} list</strong> on our platform <strong><a href="http://localhost:3000/">Empty Fridge</a></strong>.
+    You can <a href='http://localhost:3000/list/${sharedList._id}/confirm/${newInvitation.confirmationCode}'>confirm</a> or <a href='http://localhost:3000/list/${sharedList._id}/declin/${newInvitation.refuseCode}'>declin</a> this invitation, clicking on these links: <b><a href='http://localhost:3000/list/${sharedList._id}/confirm/${newInvitation.confirmationCode}'>Accept Invitation</a></b> --- <a href='http://localhost:3000/list/${sharedList._id}/declin/${newInvitation.refuseCode}'>Declin Invitation</a>`;
   })
   .catch( err => {
     console.log("PROBLEM CREATING INVITATION --->", err );
