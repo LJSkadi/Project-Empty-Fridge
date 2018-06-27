@@ -66,7 +66,7 @@ authRoutes.post("/signup", (req, res, next) => {
           to: email, 
           subject: subject, 
           text: message,
-          html: `<b>Hi ${username}, ${message} <a href='http://localhost:3000/confirm/${confirmationCode}'>confirmation link</a></b>`
+          html: `<b>Hi ${username}, ${message} <a href='${process.env.HTTP_ROOT_URL}/confirm/${confirmationCode}'>confirmation link</a></b>`
         })
         .then(info => {
           console.log( "EMAIL SENT!!!", info );

@@ -23,7 +23,7 @@ function createUsers( n ) {
   return usersList;
 }
 
-mongoose.connect( 'mongodb://localhost/project-empty-fridge' )
+mongoose.connect( `${process.env.MONGODB_URI}` )
 .then( () => {
   console.log( "Connected to MongoDB..." )
 })
