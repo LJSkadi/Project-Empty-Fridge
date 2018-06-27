@@ -13,7 +13,7 @@ function createUsers( n ) {
     const lastName = faker.name.lastName();
     const hashCode = bcrypt.hashSync( faker.lorem.word(), bcrypt.genSaltSync(8) )
     const username = `${firstName} ${lastName}`;
-    const email = firstName + "." + lastName + "@" + faker.internet.domainName;
+    const email = firstName + "." + lastName + "@" + faker.internet.domainName();
     const password = bcrypt.hashSync( "password", bcrypt.genSaltSync(8) );
     const confirmationCode = hashCode;
     const status = true;
