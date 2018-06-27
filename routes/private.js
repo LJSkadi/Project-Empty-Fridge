@@ -2,8 +2,10 @@ const express       = require("express");
 const User          = require("../models/User");
 const List          = require("../models/List");
 const Item          = require('../models/Item');
+const Invitation    = require('../models/Invitation');
 const passport      = require('passport');
 const nodemailer    = require('nodemailer');
+const bcrypt        = require('bcrypt');
 
 const privateRoutes = express.Router();
 
@@ -25,11 +27,28 @@ privateRoutes.get('/user/:userId',(req, res, next) => {
 
 //#region POST /search-user
 privateRoutes.post('/search-user', (req, res, next) => {
-  const email = req.body.email;
-  User.find({ email: email })
-  .then( users => {
-    console.log( "The LIST of the USERS --->", users );
-  })
+  const query = req.body.searchedEmail ? { email: req.body.searchedEmail } : {} ;
+
+  List.findById( req.body.listId )
+  .populate( '_items' )
+  .then( list => {
+    // show list
+    console.log("LIST AFTER SEARCHING USERS --->", list);
+    // filter items
+    const openItems = list._items.filter( (item) => item.status ==='OPEN' );
+    const closedItems = list._items.filter( (item) => item.status ==='CLOSED' );
+    // show items
+    console.log( "OPEN ITEMS --->", openItems);
+    console.log( "CLOSED ITEMS --->", closedItems);
+
+    User.find( query )
+    .then( searchedUsers => {
+      // show search result
+      console.log( "The LIST of the USERS --->", searchedUsers );
+      res.render('lists/list-details', { list: list, openItems: openItems, closedItems:closedItems, foundUsers: searchedUsers } );
+    })
+    .catch( err => { throw err } );
+  } )
   .catch( err => { throw err } );
 });
 //#endregion
@@ -118,6 +137,102 @@ privateRoutes.get('/reactivate-item/:itemId', (req, res, next) => {
   })
   .catch( err => { throw err } )
 })
+
+// create a transporter object for invitation
+let transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: process.env.GMAIL_ADDRESS,
+    pass: process.env.GMAIL_PASSWORD
+  }
+})
+
+//#region POST /create-invitation
+privateRoutes.post("/create-invitation", (req, res, next) => {
+  const sendingUser = req.user;
+  const invitedUserId = req.body.invitedUserId;
+  const listId = req.body.listId;
+
+  console.log( "INVITED USER ID --->", invitedUserId );
+  console.log( "LIST ID --->", listId );
+
+  Promise.all(
+    [
+      User.findById( invitedUserId ),
+      List.findById( listId )
+    ]
+  )
+  .then( ( result ) => {
+    //console.log( result );
+    const invitedUser = result[0];
+    const sharedList = result[1];
+
+    console.log( "You want invite THIS USER --->", invitedUser );
+    console.log( "You want to invite on THIS LIST --->", sharedList );
+
+    let newInvitation = new Invitation({
+      receivingUser: {
+        id: invitedUser._id,
+        username: invitedUser.username,
+        email: invitedUser.email
+      },
+      _list: listId,
+      confirmationCode: bcrypt.hashSync( invitedUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join(''),
+      refuseCode: bcrypt.hashSync( sendingUser.email, bcrypt.genSaltSync(8) ).split('').filter( x => x !== "/").join('')
+    });
+    console.log( "NEW INVITATION created --->", newInvitation );
+
+    // push invitation reference into list
+    sharedList._invitations.push( newInvitation._id );
+    // update the list
+    sharedList.save((err, updatedList) => {
+      if ( err ) {
+        console.log( err );
+      } else {
+        console.log( "Invitation reference inside list done!", updatedList );
+    
+        // email content for the new user with a link to confirmation code
+        const subject = `${sendingUser.email} is inviting you to join a list on emptyfridge.com`;
+        const message = `<strong>Hi ${invitedUser.username}</strong>, <strong>${sendingUser.username}</strong> is inviting you to join his/her <strong>${sharedList.name} list</strong> on our platform <strong><a href="http://localhost:3000/">Empty Fridge</a></strong>.
+        You can <a href='http://localhost:3000/invitation/${newInvitation._id}/confirm/${newInvitation.confirmationCode}'>confirm</a> or <a href='http://localhost:3000/invitation/${newInvitation._id}/decline/${newInvitation.refuseCode}'>decline</a> this invitation, clicking on these links: <b><a href='http://localhost:3000/invitation/${newInvitation._id}/confirm/${newInvitation.confirmationCode}'>Accept Invitation</a></b> --- <a href='http://localhost:3000/invitation/${newInvitation._id}/decline/${newInvitation.refuseCode}'>Decline Invitation</a>`;
+    
+        newInvitation.save( (err, invitation) => {
+          if ( err ) {
+            res.render("lists/list-details", { message: "Something went wrong" });
+          } else {
+            console.log("NEW INVITATION CREATED --->", invitation  );
+
+            transporter.sendMail({
+              from: '"Empty Fridge Project 👻" <empty.fridge@gmail.com>',
+              to: invitedUser.email, 
+              subject: subject, 
+              text: message,
+              html: `${message}`
+            })
+            .then(info => {
+              console.log( "EMAIL SENT!!!", info );
+              console.log( "Rendering list page." )
+              res.redirect(`/list/${sharedList._id}`);
+            })
+            .catch(error => {
+              console.log("ERROR CREATING USER: ", error);
+              console.log( "Redirecting new user to login page." )
+              res.redirect(`/list/${sharedList._id}`);
+            });
+            
+          }
+        });
+      }
+    })
+
+  })
+  .catch( err => {
+    console.log("PROBLEM CREATING INVITATION --->", err );
+  });
+
+});
+//#endregion
+
 
 //#region GET /logout
 privateRoutes.get("/logout", (req, res) => {
