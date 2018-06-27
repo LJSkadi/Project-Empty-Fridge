@@ -1,3 +1,10 @@
+
+@import "node_modules/bootstrap/scss/bootstrap";
+
+$primary: #66ffcc;
+
+.navbar-brand{font-family:'Niconne', cursive;} 
+
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -8,4 +15,8 @@ body {
 
 a {
   color: #00B7FF;
+}
+
+#fonts{
+  font-family: 'Nunito', sans-serif;
 }
