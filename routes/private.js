@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const User = require("../models/User");
 const List = require("../models/List");
@@ -5,6 +7,7 @@ const Item = require('../models/Item');
 const Invitation = require('../models/Invitation');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
+const uploadCloud   = require('../config/cloudinary.js');
 // Bcrypt to encrypt passwords
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
@@ -62,16 +65,17 @@ privateRoutes.get('/user/:userId/profile/edit', (req, res, next) => {
 //#endregion
 
 /* POST edit a truck*/
-privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
+privateRoutes.post('/user/:userId/profile-update', uploadCloud.single('photo'), (req, res, next) => {
+  console.log( "IMAGE FILE --->", req.file );
   let userId = req.params.userId;
   let newUsername = req.body.username;
   let newPassword = req.body.password;
-  let newImage = req.body.image;
+  let newImage = req.file ? req.file.secure_url : process.env.ANONYMOUS_USER;
   // Take care that no value is lost
-  if (newUsername === "" || newPassword === "") {
+  if (newUsername === ""){
     newUsername = req.user.username;
+  } else if( newPassword === "") {
     newPassword = req.user.password;
-    res.render(`/user/${userId}/profile/edit`, { message: "If nothing is insert, the values remain the same" });
   }
   // Check if the password should be changed
   if (!bcrypt.compareSync(newPassword, req.user.password)) {
@@ -80,11 +84,11 @@ privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
     newPassword = hashPass;
   }
   User.findByIdAndUpdate(userId, { username: newUsername, password: newPassword, profileImage: newImage }, { new: true })
-    .then( user => {
-      console.log(user)
-      res.redirect(`/user/${userId}/profile`)
-    })
-    .catch(err => { throw err });
+  .then( user => {
+    console.log(user)
+    res.redirect(`/user/${userId}/profile`)
+  })
+  .catch(err => { throw err });
 })
 
 
