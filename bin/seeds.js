@@ -7,6 +7,8 @@ const User          = require('../models/User');
 const List          = require('../models/List');
 const Item          = require('../models/Item');
 
+var numberOfUsers = 25;
+
 // creating a list of users
 function createUsers( n ) {
   let usersList = [];
@@ -101,14 +103,41 @@ const createItemsInList = function ( numOfItems, user, list ) {
 }
 
 
+// create members for list
+// const populateMembers = function ( numOfMembers, list ) {
+//   return new Promise( (resolve, reject) => {
+//     for (let i = 0; i < numOfMembers; i++) {
+//       var random = Math.floor( Math.random() * numberOfUsers );
+//       User.find()
+//       .skip(random)
+//       .limit(1)
+//       .then( user => {
+//         push random user to list._members
+//         list._members.push( user._id );
+//         // updateing the list
+//         list.save( (err, updatedList) => {
+//           if (err) {
+//             console.log( "ERROR while creating member", err )
+//             reject( err );
+//           } else {
+//             console.log( "MEMBER ADDED!!!", updatedList );
+//             resolve( updatedList);
+//           }
+//         })
+//       })
+//       .catch( err => { throw err } );
+//     }
+//   })
+// }
+
 Promise.all(
   [
   // #0 creating elliot account
   elliot.save(),
   // #1 creating elliot account
   silvio.save(),
-  // #2 insert 15 new users to the database
-  User.insertMany( createUsers( 15 ) ),
+  // #2 insert 25 new users to the database
+  User.insertMany( createUsers( numberOfUsers ) ),
   // #3 saving Elliot's list
   elliotList.save(),
   // #4 saving Silvio's list
@@ -117,6 +146,10 @@ Promise.all(
   createItemsInList( 10, elliot, elliotList ),
   // #6 creating items in Silvio's list
   createItemsInList( 10, silvio, silvioList )
+  // #7 adding members to Silvio's list
+  //populateMembers( 6, silvioList ),
+  // #8 adding members to Elliot's list
+  //populateMembers( 6, elliotList )
 ]
 )
 .then( ( result ) => {
