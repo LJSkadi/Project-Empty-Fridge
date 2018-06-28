@@ -8,11 +8,22 @@ const List          = require('../models/List');
 const Item          = require('../models/Item');
 const Invitation    = require('../models/Invitation');
 
-var numberOfUsers = 25;
+var numberOfUsers = 15;
+const usersList = [];
+
+mongoose.connect( `${process.env.MONGODB_URI}` )
+.then( () => {
+  console.log( "Connected to MongoDB..." )
+})
+.catch( err => { throw err } );
+
+User.collection.drop();
+List.collection.drop();
+Item.collection.drop();
+
 
 // creating a list of users
 function createUsers( n ) {
-  let usersList = [];
   for ( let i = 0; i < n; i++ ) {
     const firstName = faker.name.firstName();
     const lastName = faker.name.lastName();
@@ -23,21 +34,25 @@ function createUsers( n ) {
     const password = bcrypt.hashSync( "password", bcrypt.genSaltSync(8) );
     const confirmationCode = hashCode;
     const status = true;
-    const newUser = { username, email, profileImage, password, confirmationCode, status };
+
+    const newUser = new User(
+      { username, email, profileImage, password, confirmationCode, status }
+    );
+    // push user into list _members
     usersList.push( newUser );
+    // save new user on DB
+    newUser.save( (err) => {
+      if (err) {
+        console.log("ERROR creating user --->", err)
+      } else {
+        console.log( "NEW USER CREATED!!!" )
+      }
+    })
   }
-  return usersList;
 }
 
-mongoose.connect( `${process.env.MONGODB_URI}` )
-.then( () => {
-  console.log( "Connected to MongoDB..." )
-})
-.catch( err => { throw err } )
+createUsers( numberOfUsers );
 
-User.collection.drop();
-List.collection.drop();
-Item.collection.drop();
 
 const elliot = new User({
   username: "elliot",
@@ -109,25 +124,20 @@ const populateMembers = function ( numOfMembers, list ) {
   return new Promise( (resolve, reject) => {
     console.log( "I AM IN THE PROMISE!!!" )
     for (let i = 0; i < numOfMembers; i++) {
-      // const randomNumber = Math.floor( Math.random() * numberOfUsers );
-      // console.log( "RANDOM --->", randomNumber );
-      User.find()
-      .then( users => {
-        //console.log("RANDOM USER --->", user);
-        //push random user to list._members
-        list._members.push( users[0]._id );
-        // updateing the list
-        list.save( (err, updatedList) => {
-          if (err) {
-            console.log( "ERROR while creating member", err )
-            reject( err );
-          } else {
-            console.log( "MEMBER ADDED!!!", updatedList );
-            resolve( updatedList);
-          }
-        })
+      const randomNumber = Math.floor( Math.random() * numberOfUsers );
+      //console.log("RANDOM USER --->", user);
+      //push random user to list._members
+      list._members.push( usersList[randomNumber]._id );
+      // updateing the list
+      list.save( (err, updatedList) => {
+        if (err) {
+          console.log( "ERROR while creating member", err )
+          reject( err );
+        } else {
+          console.log( "MEMBER ADDED!!!", updatedList );
+          resolve( updatedList);
+        }
       })
-      .catch( err => { throw err } );
     }
   })
 }
@@ -139,32 +149,36 @@ Promise.all(
   // #1 creating silvio account
   silvio.save(),
   // #2 insert 25 new users to the database
-  User.insertMany( createUsers( numberOfUsers ) ),
-  // #3 saving Elliot's list
+  //User.insertMany( createUsers( numberOfUsers ) ),
+  // #2 saving Elliot's list
   elliotList.save(),
-  // #4 saving Silvio's list
+  // #3 saving Silvio's list
   silvioList.save(),
-  // #5 adding items to Elliot's list
+  // #4 adding items to Elliot's list
   createItemsInList( 10, elliot, elliotList ),
-  // #6 creating items in Silvio's list
+  // #5 creating items in Silvio's list
   createItemsInList( 10, silvio, silvioList ),
-  // #7 adding members to Silvio's list
-  populateMembers( 6, silvioList )
-  // #8 adding members to Elliot's list
-  //populateMembers( 6, elliotList )
+  // #6 adding members to Silvio's list
+  populateMembers( 6, silvioList ),
+  // #7 adding members to Elliot's list
+  populateMembers( 6, elliotList )
 ]
 )
 .then( ( result ) => {
   const dbElliot = result[0];
   const dbSilvio = result[1];
-  const others = result[2];
-  const dbElliotList = result[3];
+  const dbElliotList = result[2];
+  const dbSilvioList = result[3]
   
   console.log( "ELLIOT created --->", dbElliot );
   console.log( "SILVIO created --->", dbSilvio );
-  console.log( `${others.length} other users created` );
   console.log( "ELLIOT's LIST created --->", dbElliotList );
-  mongoose.disconnect();
+  console.log( "Silvio's LIST created --->", dbSilvioList );
+
+  setTimeout( () => {
+    mongoose.disconnect();
+  }, 8000)
+    
 })
 .catch( err => { throw err } );
 
