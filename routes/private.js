@@ -5,7 +5,10 @@ const Item = require('../models/Item');
 const Invitation = require('../models/Invitation');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
-const bcrypt = require('bcrypt');
+// Bcrypt to encrypt passwords
+const bcrypt = require("bcrypt");
+const bcryptSalt = 10;
+
 
 const privateRoutes = express.Router();
 
@@ -66,18 +69,18 @@ privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
   let newImage = req.body.image;
   // Take care that no value is lost
   if (newUsername === "" || newPassword === "") {
-    newUsername = user.username;
-    newPassword = user.password;
+    newUsername = req.user.username;
+    newPassword = req.user.password;
     res.render(`/user/${userId}/profile/edit`, { message: "If nothing is insert, the values remain the same" });
   }
   // Check if the password should be changed
-  if (!bcrypt.compareSync(newPassword, user.password)) {
+  if (!bcrypt.compareSync(newPassword, req.user.password)) {
     const salt = bcrypt.genSaltSync(bcryptSalt);
     const hashPass = bcrypt.hashSync(newPassword, salt);
     newPassword = hashPass;
   }
   User.findByIdAndUpdate(userId, { username: newUsername, password: newPassword, profileImage: newImage }, { new: true })
-    .then(user => {
+    .then( user => {
       console.log(user)
       res.redirect(`/user/${userId}/profile`)
     })
