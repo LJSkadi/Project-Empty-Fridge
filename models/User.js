@@ -5,7 +5,7 @@ const userSchema = new Schema({
   username: {type: String, required: true},
   email:    {type: String, required: true, unique: true},
   password: String,
-  //image: String,
+  profileImage: String,
   confirmationCode: String,
   //_list: [{type:[Schema.Types.ObjectId], ref: 'List'}],
   status: {type: Boolean, default: false}

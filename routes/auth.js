@@ -1,7 +1,10 @@
+require('dotenv').config();
+
 const express       = require("express");
 const passport      = require('passport');
 const User          = require("../models/User");
 const nodemailer    = require('nodemailer');
+const uploadCloud   = require('../config/cloudinary.js');
 
 const authRoutes = express.Router();
 
@@ -26,10 +29,11 @@ authRoutes.get("/signup", (req, res, next) => {
 //#endregion
 
 //#region POST /signup
-authRoutes.post("/signup", (req, res, next) => {
+authRoutes.post("/signup", uploadCloud.single('photo'), (req, res, next) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
+  const imagePath = req.file ? req.file.secure_url : process.env.ANONIMOUS_USER;
   if (username === "" || email === "" || password === "") {
     res.render( "users/signup", { message: "You must indicate username, email and password" } );
     return;
@@ -49,6 +53,7 @@ authRoutes.post("/signup", (req, res, next) => {
     const newUser = new User({
       username,
       email,
+      profileImage: imagePath,
       password: hashPass,
       confirmationCode
     });

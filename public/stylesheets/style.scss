@@ -1,5 +1,5 @@
 
-$primary: #33ffbb;
+// $primary: #33ffbb;
 @import "node_modules/bootstrap/scss/bootstrap";
 
 .navbar-brand{font-family:'Pinyon Script', cursive;} 
@@ -20,4 +20,10 @@ a {
 
 .pending-invitation {
   line-height: 25px;
+}
+
+.member-avatar {
+  height: 32px;
+  width: 32px;
+  border-radius: 25em;
 }
