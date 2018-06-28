@@ -16,10 +16,11 @@ function createUsers( n ) {
     const hashCode = bcrypt.hashSync( faker.lorem.word(), bcrypt.genSaltSync(8) )
     const username = `${firstName} ${lastName}`;
     const email = firstName + "." + lastName + "@" + faker.internet.domainName();
+    const profileImage = `${process.env.ANONYMOUS_USER}`;
     const password = bcrypt.hashSync( "password", bcrypt.genSaltSync(8) );
     const confirmationCode = hashCode;
     const status = true;
-    const newUser = { username, email, password, confirmationCode, status };
+    const newUser = { username, email, profileImage, password, confirmationCode, status };
     usersList.push( newUser );
   }
   return usersList;
@@ -38,6 +39,7 @@ Item.collection.drop();
 const elliot = new User({
   username: "elliot",
   email: "lj.skadi@gmail.com",
+  profileImage: `${process.env.ANONYMOUS_USER}`,
   password: bcrypt.hashSync( "abc", bcrypt.genSaltSync(8) ),
   confirmationCode: bcrypt.hashSync( "confirm", bcrypt.genSaltSync(8) ),
   status: true
@@ -46,6 +48,7 @@ const elliot = new User({
 const silvio = new User({
   username: "silvio",
   email: "silvio.galli@gmail.com",
+  profileImage: `${process.env.ANONYMOUS_USER}`,
   password: bcrypt.hashSync( "silvio", bcrypt.genSaltSync(8) ),
   confirmationCode: bcrypt.hashSync( "confirm", bcrypt.genSaltSync(8) ),
   status: true

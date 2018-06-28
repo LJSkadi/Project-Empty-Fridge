@@ -1,25 +1,33 @@
 
 <h2>Login</h2>
 
-<form action="/login" method="POST" id="form-container">
-  <label for="email">Email</label>
-  <input id="email" type="email" name="email" placeholder="Enter your email">
+<div class="row">
+  <div class="col-md-4">
+    {{#if message }}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {{/if}}
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input class="form-control" id="email" type="email" name="email" placeholder="Enter your email">
+      </div>
 
-  <br><br>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input class="form-control" id="password" type="password" name="password" placeholder="Enter your password">
+      </div>
 
-  <label for="password">Password</label>
-  <input id="password" type="password" name="password" placeholder="Enter your password">
-  <br>
-  {{#if message }}
-    <div class="error-message">{{ message }}</div>
-  {{/if}}
+      <button type="submit" class="btn btn-success">Login</button>
+    </form>
+  </div>
+</div>
 
-  <br><br>
-
-  <button>Login</button>
-
-  <p class="account-message">
-    Don't have an account yet?
-    <a href="/signup">Signup</a>
-  </p>
-</form>
+<p class="lead">
+  Don't have an account yet?
+  <a href="/signup">Signup</a>
+</p>
