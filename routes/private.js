@@ -239,6 +239,29 @@ privateRoutes.get('/list/:listId/reactivate-item/:itemId', isMember, (req, res, 
     })
     .catch(err => { throw err })
 })
+//#endregion
+
+//#region DELETE MEMBER FROM LIST -> GET /list/listId/delete-member/memberId
+privateRoutes.get('/list/:listId/delete-member/:memberId', isCreator, (req,res,next) => {
+  const listId = req.params.listId;
+  const memberId = req.params.memberId;
+  List.findById( listId )
+  .populate( '_members' )
+  .then( list => {
+    // removing member from list
+    list._members.pull( { _id: memberId } );
+    // updating list after removing member
+    list.save( (err, updatedList) => {
+      if ( err ) {
+        console.log( "ERROR updating list after removing member --->", err );
+      } else {
+        res.redirect(`/list/${updatedList._id}`);
+      }
+    });
+  })
+  .catch( err => { throw err })
+});
+//#end
 
 // create a transporter object for invitation
 let transporter = nodemailer.createTransport({

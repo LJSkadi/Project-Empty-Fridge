@@ -6,6 +6,9 @@ const faker         = require('faker');
 const User          = require('../models/User');
 const List          = require('../models/List');
 const Item          = require('../models/Item');
+const Invitation    = require('../models/Invitation');
+
+var numberOfUsers = 25;
 
 // creating a list of users
 function createUsers( n ) {
@@ -101,14 +104,42 @@ const createItemsInList = function ( numOfItems, user, list ) {
 }
 
 
+// create members for list
+const populateMembers = function ( numOfMembers, list ) {
+  return new Promise( (resolve, reject) => {
+    console.log( "I AM IN THE PROMISE!!!" )
+    for (let i = 0; i < numOfMembers; i++) {
+      // const randomNumber = Math.floor( Math.random() * numberOfUsers );
+      // console.log( "RANDOM --->", randomNumber );
+      User.find()
+      .then( users => {
+        //console.log("RANDOM USER --->", user);
+        //push random user to list._members
+        list._members.push( users[0]._id );
+        // updateing the list
+        list.save( (err, updatedList) => {
+          if (err) {
+            console.log( "ERROR while creating member", err )
+            reject( err );
+          } else {
+            console.log( "MEMBER ADDED!!!", updatedList );
+            resolve( updatedList);
+          }
+        })
+      })
+      .catch( err => { throw err } );
+    }
+  })
+}
+
 Promise.all(
   [
   // #0 creating elliot account
   elliot.save(),
-  // #1 creating elliot account
+  // #1 creating silvio account
   silvio.save(),
-  // #2 insert 15 new users to the database
-  User.insertMany( createUsers( 15 ) ),
+  // #2 insert 25 new users to the database
+  User.insertMany( createUsers( numberOfUsers ) ),
   // #3 saving Elliot's list
   elliotList.save(),
   // #4 saving Silvio's list
@@ -116,7 +147,11 @@ Promise.all(
   // #5 adding items to Elliot's list
   createItemsInList( 10, elliot, elliotList ),
   // #6 creating items in Silvio's list
-  createItemsInList( 10, silvio, silvioList )
+  createItemsInList( 10, silvio, silvioList ),
+  // #7 adding members to Silvio's list
+  populateMembers( 6, silvioList )
+  // #8 adding members to Elliot's list
+  //populateMembers( 6, elliotList )
 ]
 )
 .then( ( result ) => {
@@ -124,7 +159,7 @@ Promise.all(
   const dbSilvio = result[1];
   const others = result[2];
   const dbElliotList = result[3];
-
+  
   console.log( "ELLIOT created --->", dbElliot );
   console.log( "SILVIO created --->", dbSilvio );
   console.log( `${others.length} other users created` );

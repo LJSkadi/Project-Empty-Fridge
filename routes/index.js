@@ -55,7 +55,6 @@ router.get('/invitation/:invitationId/confirm/:confirmationCode', (req, res, nex
 
 //#region DECLINE invitation
 router.get('/invitation/:invitationId/decline/:refuseCode', (req, res, next) => {
-  //console.log( req.params );
   const invitationId = req.params.invitationId;
   const passedRefuseCode = req.params.refuseCode;
   Invitation.findById( invitationId )
