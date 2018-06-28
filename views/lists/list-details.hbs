@@ -50,11 +50,14 @@
     <!-- MEMBERS -->
     {{#if listMembers}}
       <h3>List members</h3>
-      <ul>
-        {{#each listMembers}}
-          <li>{{this.username}}</li>
-        {{/each}}
-      </ul>
+      {{#each listMembers}}
+        <div class="badge badge-primary list-member mt-2">
+          <strong>{{this.username}}</strong>
+          <a href="#" class="close">
+           <span>&times;</span>
+          </a>
+        </div>
+      {{/each}}
     {{else}}
       <h3>This list has no <em>members</em></h3>
     {{/if}}
@@ -78,15 +81,13 @@
 
   <!-- SEARCH USERS -->
   <div class="col-md-3">
-    <form class="form-inline" action="/search-user" method="post">
-      <div class="form-group mb-2">
-        <input type="email" class="form-control" name="searchedEmail" placeholder="Search for email">
-      </div>
+    <form class="form-inline mt-3" action="/search-user" method="post">
       <div class="form-group">
-        <input type="hidden" name="listId" value="{{list._id}}">
+        <input type="email" class="form-control" name="searchedEmail" placeholder="Search users with email">
       </div>
+      <input type="hidden" name="listId" value="{{list._id}}">
       <div class="form-group">
-        <button type="submit" class="btn btn-primary mb-2">Search</button>
+        <button type="submit" class="btn btn-primary">Search</button>
       </div>
     </form>
 
