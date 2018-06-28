@@ -53,7 +53,7 @@
       {{#each listMembers}}
         <div class="badge badge-primary list-member mt-2">
           <strong>{{this.username}}</strong>
-          <a href="#" class="close">
+          <a href="/list/{{../list._id}}/delete-member/{{this.id}}" class="close">
            <span>&times;</span>
           </a>
         </div>
