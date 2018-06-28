@@ -1,0 +1,40 @@
+<!-- PROFILE-EDIT.hbs -->
+<div class="cards-container d-flex flex-wrap justify-content-center align-content-center">
+    <div class="card details" style="width: 20rem;">
+        <form action="/user/{{user._id}}/profile/update" method="post">
+            <div>
+                <img class="card-img-top" src="{{user.image}}" alt="Card image cap">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <strong>{{this.username}}</strong>
+                    </h1>
+                    <div>
+                        <div>
+                            <label for="">Username:</label>
+                            <input type="text" name="username" value="{{user.username}}">
+                        </div>
+                        <div>
+                            <label for="">Email:</label>
+                            <input type="email" name="email" value="{{user.email}}">
+                        </div>
+                        <div>
+                            <label for="">Password:</label>
+                            <input type="password" name="password" value="New Password">
+                        </div>
+                        <div>
+                            <label for="image">Image</label>
+                            <input id="image" type="text" name="image" value="{{user.image}}">
+                        </div>
+                        <div>
+                        </div>
+                        <div class="justify-content-between">
+                            <p>
+                                <button type="submit" class="btn btn-primary btn active">EDIT</button>
+                                <a class="btn btn-primary btn active" href="/user/{{user._id}}/profile">Back</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>

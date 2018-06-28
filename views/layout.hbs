@@ -21,12 +21,12 @@
         <ul class="navbar-nav">
           {{#if currentUser}}
             <li class="nav-item">
-              <a class="nav-link" href="">
+              <a class="nav-link" href="/user/{{currentUser._id}}/profile">
                 <img class="member-avatar" src="{{currentUser.profileImage}}" alt="{{currentUser.name}} profile image.">
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/user/{{currentUser._id}}">{{currentUser.username}}'s Fridge Lists</a>
+              <a class="nav-link" href="/user/{{currentUser._id}}">{{currentUser.username}}'s Dashboard</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Log out</a>
