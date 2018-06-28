@@ -48,7 +48,7 @@ privateRoutes.get('/user/:userId/profile', (req, res, next) => {
 });
 //#endregion
 
-//#region GET /Profile
+//#region GET /Profile-edit
 privateRoutes.get('/user/:userId/profile/edit', (req, res, next) => {
   Promise.all(
     [User.findById(req.params.userId),
@@ -61,7 +61,7 @@ privateRoutes.get('/user/:userId/profile/edit', (req, res, next) => {
 });
 //#endregion
 
-/* POST edit a truck*/
+//#region POST /Profile-edit
 privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
   let userId = req.params.userId;
   let newUsername = req.body.username;
@@ -80,12 +80,33 @@ privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
     newPassword = hashPass;
   }
   User.findByIdAndUpdate(userId, { username: newUsername, password: newPassword, profileImage: newImage }, { new: true })
-    .then( user => {
+    .then(user => {
       console.log(user)
       res.redirect(`/user/${userId}/profile`)
     })
     .catch(err => { throw err });
 })
+//#endregion
+
+//#region GET /Profile-delete
+privateRoutes.get('/user/:userId/profile/delete', (req, res, next) => {
+  User.findById(req.params.userId)
+    .then(user => {
+      List.findOneAndUpdate({ _creator: req.params.userId }, { _creator: _members[1] })
+        .populate(_members)
+        .then(list => {
+          res.render(`/user/${userId}/profile`, { message: `The new owner of your list is ${_members[1].username}` });
+        })
+        .catch(err => { throw err });
+      User.findByIdAndRemove(req.params.userId)
+        .then(user => {
+          res.render(`/signup`, { message: `Your account was deleted` });
+        })
+        .catch(err => { throw err });
+    })
+    .catch(err => { throw err });
+});
+//#endregion
 
 
 //#region LIST
