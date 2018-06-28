@@ -1,48 +1,86 @@
 <h1>{{currentUser.username}}'s Dashboard</h1>
 <div class="row">
-  <div class="col-md-4">
-    <h2>My Lists</h2>
-    {{#each lists}}
-    <ul>
-      <li>
-       <a href="/list/{{this._id}}">"{{this.name}}"</a>
-       </li>
-    </ul>
-    {{/each}}
-    <a href="/new-list" class="btn btn-success">Create New List</a>
+  <div class="col-md-4 mb-3">
+    <h2>
+      My Lists
+      <small>
+        <a href="/new-list" class="btn btn-success">Create New List</a>
+      </small>
+    </h2>
+    {{#if lists}}
+      {{#each lists}}
+        <div class="shadow bg-light my-4 p-2">
+          <p class="lead">
+            {{this.name}}
+          </p>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="lead">
+        Please, put some lists here...
+      </p>
+    {{/if}}
   </div>
-  <div class="col-md-4">
-    <h2>Sent Invitations (pending)</h2>
-    <ul id="sent-invitations">
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-    </ul>
+  <div class="col-md-4 mb-3">
+    <h4 class="p-2 mb-2 bg-secondary text-white rounded">
+      Sent Invitations
+    </h4>
+    {{#if lists}}
+      {{#each lists}}
+        {{#if this._invitations}}
+          <h5 class="mt-2">
+            {{this.name}}
+            <small class="badge badge-success" title="You have {{this._invitations.length}} pending invitations.">
+              {{this._invitations.length}}
+            </small>
+            <span class="sr-only">pending</span>
+        </h5>
+        <hr style="margin: 0;">
+          {{#each this._invitations}}
+            <div class="badge badge-info pending-invitation mt-1">
+              <strong>{{this.receivingUser.username}}</strong>
+              <a href="/invitation/{{this._id}}/decline/{{this.refuseCode}}" class="close">
+              <span>&times;</span>
+              </a>
+            </div>
+          {{/each}}
+        {{else}}
+          No invitations for <b>{{this.name}}</b>
+          <hr>
+        {{/if}}
+      {{/each}}
+    {{else}}
+      <div class="badge badge-secondary"><h3>You did not invite</h3></div>
+    {{/if}}
   </div>
-  <div class="col-md-4">
-    <h2>Received Invitations (pending)</h2>
-    <ul id="received-invitations">
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-    </ul>
+
+  <div class="col-md-4 mb-3">
+    <h4 class="p-2 mb-2 bg-secondary text-white rounded">
+      Received Invitations
+      <span class="badge badge-light" title="You have {{receivedInvitations.length}} pending invitations.">
+        {{#if receivedInvitations}}
+          {{receivedInvitations.length}}
+        {{else}}
+          0
+        {{/if}}
+      </span>
+      <span class="sr-only">pending</span>
+    </h4>
+    {{#if receivedInvitations}}
+      {{#each receivedInvitations}}
+        <div>
+          <b>{{this._list._creator.username}}</b> asks to join on <b>{{this._list.name}}</b>
+          <br>
+          <a class="btn btn-success btn-sm" href="/invitation/{{this._list._id}}/confirm/{{this.confirmationCode}}">
+            Accept
+          </a>
+          <a class="btn btn-danger btn-sm" href="/invitation/{{this._list._id}}/decline/{{this.refuseCode}}">
+            Decline
+          </a>
+          <hr>
+        </div>
+      {{/each}}
+    {{else}}
+    {{/if}}
   </div>
 </div>
