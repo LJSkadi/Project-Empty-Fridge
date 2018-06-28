@@ -88,24 +88,77 @@ privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
 })
 //#endregion
 
-//#region GET /Profile-delete
 privateRoutes.get('/user/:userId/profile/delete', (req, res, next) => {
-  User.findById(req.params.userId)
+  let userId = req.params.userId;
+  User.findById(userId)
     .then(user => {
-      List.findOneAndUpdate({ _creator: req.params.userId }, { _creator: _members[1] })
-        .populate(_members)
-        .then(list => {
-          res.render(`/user/${userId}/profile`, { message: `The new owner of your list is ${_members[1].username}` });
-        })
-        .catch(err => { throw err });
-      User.findByIdAndRemove(req.params.userId)
-        .then(user => {
-          res.render(`/signup`, { message: `Your account was deleted` });
+      List.find({ _creator: `${userId}` })
+        .populate('_members')
+        .then(lists => {
+          res.render('users/profile-delete', { user, lists });
         })
         .catch(err => { throw err });
     })
     .catch(err => { throw err });
 });
+
+//#region POST /Profile-delete
+privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
+  console.log(req.body)
+  let userId = req.user._id;
+  let listId = req.params.listId;
+  List.find({ _creator: `${userId}` })
+    .then(lists => {
+      lists.forEach(element => {
+        let listId = element._id;
+        console.log("This is the value of the listId", req.body['listId']);
+        let value = req.body['listId'];
+        if (value === 'delete'){
+          List.findById(listId)
+            .then(list => {
+              Item.deleteMany({ _list: listId })
+                .then(itemsDeleted => {
+                  List.findByIdAndRemove(listId)
+                    .then(listToDelete => {
+                      let message = "Your list is deleted successfully";
+
+                      res.redirect(`/user/${userId}`)
+                    })
+                })
+                .catch(err => { throw err })
+            })
+            .catch(err => { throw err })
+        } else {
+          //change the Owner of the list and remove the _creator from the members
+          const memberId = value;
+          List.findById(listId)
+            .populate('_creator')
+            .populate('_members')
+            .then(list => {
+              // removing member from list
+              list._creator = memberId;
+              list._members.pull({ _id: req.params.userId });
+              // updating list after removing member
+              list.save((err, updatedList) => {
+                if (err) {
+                  console.log("ERROR changing the Creator of the List --->", err);
+                } else {
+                  res.render(`/user/${userId}/profile/delete`, { message: `The new owner of your list is ${_creator.username}` });
+                }
+              });
+            })
+            .catch(err => { throw err })
+        }
+      })
+    })
+    .catch(err => { throw err });
+
+  User.findByIdAndRemove(req.params.userId)
+    .then(user => {
+      res.render(`/signup`, { message: `Your account was deleted` });
+    })
+    .catch(err => { throw err });
+})
 //#endregion
 
 
@@ -242,24 +295,24 @@ privateRoutes.get('/list/:listId/reactivate-item/:itemId', isMember, (req, res, 
 //#endregion
 
 //#region DELETE MEMBER FROM LIST -> GET /list/listId/delete-member/memberId
-privateRoutes.get('/list/:listId/delete-member/:memberId', isCreator, (req,res,next) => {
+privateRoutes.get('/list/:listId/delete-member/:memberId', isCreator, (req, res, next) => {
   const listId = req.params.listId;
   const memberId = req.params.memberId;
-  List.findById( listId )
-  .populate( '_members' )
-  .then( list => {
-    // removing member from list
-    list._members.pull( { _id: memberId } );
-    // updating list after removing member
-    list.save( (err, updatedList) => {
-      if ( err ) {
-        console.log( "ERROR updating list after removing member --->", err );
-      } else {
-        res.redirect(`/list/${updatedList._id}`);
-      }
-    });
-  })
-  .catch( err => { throw err })
+  List.findById(listId)
+    .populate('_members')
+    .then(list => {
+      // removing member from list
+      list._members.pull({ _id: memberId });
+      // updating list after removing member
+      list.save((err, updatedList) => {
+        if (err) {
+          console.log("ERROR updating list after removing member --->", err);
+        } else {
+          res.redirect(`/list/${updatedList._id}`);
+        }
+      });
+    })
+    .catch(err => { throw err })
 });
 //#end
 
@@ -371,7 +424,6 @@ privateRoutes.get('/delete-list/:listId', isCreator, (req, res, next) => {
   let listId = req.params.listId;
   List.findById(listId)
     .then(list => {
-      //if (`${userId}` == `${list._creator}`){
       Item.deleteMany({ _list: listId })
         .then(itemsDeleted => {
           List.findByIdAndRemove(req.params.listId)
@@ -382,9 +434,6 @@ privateRoutes.get('/delete-list/:listId', isCreator, (req, res, next) => {
             })
         })
         .catch(err => { throw err })
-      //}else{
-      //  res.redirect(`/user/${userId}`)
-      //}
     })
     .catch(err => { throw err })
 })

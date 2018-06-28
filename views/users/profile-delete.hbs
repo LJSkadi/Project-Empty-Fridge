@@ -1,0 +1,38 @@
+<!-- PROFILE-EDIT.hbs -->
+<div class="cards-container d-flex flex-wrap justify-content-center align-content-center">
+    <div class="card details" style="width: 20rem;">
+        <form action="/user/{{user._id}}/profile/delete" method="post">
+            <div>
+                <img class="card-img-top" src="{{user.profileImage}}" alt="Card image cap">
+                <div class="card-body">
+                    <h1 class="card-title">
+                        <strong>{{this.username}}</strong>
+                    </h1>
+                    <label for="">Please decide, if your lists should be deleted or inherent to a list member</label>
+                    <strong>Your Lists:</strong>
+                    <ul>
+                        {{#each lists}}
+                        <li>
+                            {{ this.name }}
+                            <div>
+                                <label for="">New Host/Delete</label>
+                                <select type="text" name="{{this._id}}">>
+                                    {{#each this._members}}
+                                    <option value="{{this._id}}">{{this.username}}</option>
+                                    {{/each}}
+                                    <button value="delete">delete</button>
+                                </select>
+                            </div>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                <div class="justify-content-between">
+                    <p>
+                        <button type="submit" class="btn btn-danger btn active">Delete my Profile</button>
+                        <a class="btn btn-primary btn active" href="/user/{{user._id}}/profile">Don't delete</a>
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>

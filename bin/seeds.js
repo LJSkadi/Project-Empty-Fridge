@@ -115,6 +115,7 @@ const populateMembers = function ( numOfMembers, list ) {
       .then( users => {
         //console.log("RANDOM USER --->", user);
         //push random user to list._members
+        console.log(users)
         list._members.push( users[0]._id );
         // updateing the list
         list.save( (err, updatedList) => {
@@ -155,6 +156,7 @@ Promise.all(
 ]
 )
 .then( ( result ) => {
+  
   const dbElliot = result[0];
   const dbSilvio = result[1];
   const others = result[2];
