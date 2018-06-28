@@ -65,7 +65,7 @@ privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
   let newEmail = req.body.email;
   let newPassword = req.body.password;
   let newImage = req.body.image;
-  User.findByIdAndUpdate( userId , { username: newUsername, email: newEmail, password: newPassword, image: newImage }, { new: true })
+  User.findByIdAndUpdate( userId , { username: newUsername, email: newEmail, password: newPassword, profileImage: newImage }, { new: true })
     .then( user => {
       console.log(user)
       res.redirect(`/user/${userId}/profile`)

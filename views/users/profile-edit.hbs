@@ -3,7 +3,7 @@
     <div class="card details" style="width: 20rem;">
         <form action="/user/{{user._id}}/profile/update" method="post">
             <div>
-                <img class="card-img-top" src="{{user.image}}" alt="Card image cap">
+                <img class="card-img-top" src="{{user.profileImage}}" alt="Card image cap">
                 <div class="card-body">
                     <h1 class="card-title">
                         <strong>{{this.username}}</strong>
@@ -23,7 +23,7 @@
                         </div>
                         <div>
                             <label for="image">Image</label>
-                            <input id="image" type="text" name="image" value="{{user.image}}">
+                            <input id="image" type="text" name="image" value="{{user.profileImage}}">
                         </div>
                         <div>
                         </div>
