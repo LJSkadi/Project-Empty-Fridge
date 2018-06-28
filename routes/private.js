@@ -31,15 +31,58 @@ function isIncluded( role ) {
 const isCreator  = isIncluded( "_creator" );
 const isMember = isIncluded( "_members" );
 
+//#region PROFILE
+//#region GET /Profile
+privateRoutes.get('/user/:userId/profile',(req, res, next) => {
+  Promise.all(
+    [User.findById( req.params.userId ),
+    List.find( { _creator : req.params.userId })]
+  )
+  .then( ( array ) => {
+    res.render( 'users/profile', { user: array[0], lists: array[1]} );
+  } )
+  .catch( err => { throw err } );
+});
+//#endregion
+
+//#region GET /Profile
+privateRoutes.get('/user/:userId/profile/edit', (req, res, next) => {
+  Promise.all(
+    [User.findById( req.params.userId ),
+    List.find( { _creator : req.params.userId })]
+  )
+  .then( ( array ) => {
+    res.render( 'users/profile-edit', { user: array[0], lists: array[1]} );
+  } )
+  .catch( err => { throw err } );
+});
+//#endregion
+
+/* POST edit a truck*/
+privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
+  let userId = req.params.userId;
+  let newUsername = req.body.username;
+  let newEmail = req.body.email;
+  let newPassword = req.body.password;
+  let newImage = req.body.image;
+  User.findByIdAndUpdate( userId , { username: newUsername, email: newEmail, password: newPassword, image: newImage }, { new: true })
+    .then( user => {
+      console.log(user)
+      res.redirect(`/user/${userId}/profile`)
+    })
+    .catch( err => { throw err } );
+})
+
+
 //#region LIST
-//#region GET /Profilpage
+//#region GET /Dashboard
 privateRoutes.get('/user/:userId',(req, res, next) => {
   Promise.all(
     [User.findOne( { "_id": req.params.userId } ),
     List.find( { _creator : req.params.userId })]
   )
   .then( ( array ) => {
-    res.render( 'users/profile', { user: array[0], lists: array[1]} );
+    res.render( 'users/dashboard', { user: array[0], lists: array[1]} );
   } )
   .catch( err => { throw err } );
 });

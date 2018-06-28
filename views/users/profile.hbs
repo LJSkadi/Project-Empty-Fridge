@@ -1,48 +1,37 @@
-<h1>{{currentUser.username}}'s Profile Page</h1>
-<div class="row">
-  <div class="col-md-4">
-    <h2>My Lists</h2>
-    {{#each lists}}
-    <ul>
-      <li>
-       <a href="/list/{{this._id}}">"{{this.name}}"</a>
-       </li>
-    </ul>
-    {{/each}}
-    <a href="/new-list" class="btn btn-success">Create New List</a>
-  </div>
-  <div class="col-md-4">
-    <h2>Sent Invitations (pending)</h2>
-    <ul id="sent-invitations">
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-    </ul>
-  </div>
-  <div class="col-md-4">
-    <h2>Received Invitations (pending)</h2>
-    <ul id="received-invitations">
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-      <li>
-        <a href="#">user name</a>
-      </li>
-    </ul>
-  </div>
+<!-- PROFILE.hbs -->
+<div class="cards-container d-flex flex-wrap justify-content-center align-content-center">
+    <div class="card details" style="width: 20rem;">
+        <img class="card-img-top" src="{{user.image}}" alt="Card image cap">
+        <div class="card-body">
+            <h1 class="card-title">
+                <strong>{{user.username}}</strong>
+            </h1>
+            <div>
+                <p>
+                    <strong>Username:</strong> {{user.username}}</p>
+                <p>
+                    <strong>Email:</strong> {{user.email}}</p>
+                <p>
+                    <strong>Password:</strong> We don't show your Password to anybody
+                    <br> but you can change it</p>
+                <p>
+                    <strong>Your Lists:</strong>
+                    <ul>
+                        {{#each lists}}
+                        <li>
+                            {{ this.name }}
+                            <a href="/delete-list/{{lists._id}}">delete</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </p>
+            </div>
+        </div>
+        <p>
+            <a href="/user/{{user._id}}/profile/edit" class="btn btn-primary btn active" role="button">Edit my Profile</a>
+        </p>
+        <p>
+            <a href="/user/{{user._id}}" class="btn btn-primary btn active" role="button">Back to my Dashboard!</a>
+        </p>
+    </div>
 </div>
