@@ -25,8 +25,8 @@ Item.collection.drop();
 // creating a list of users
 function createUsers( n ) {
   for ( let i = 0; i < n; i++ ) {
-    const firstName = faker.name.firstName();
-    const lastName = faker.name.lastName();
+    const firstName = faker.name.firstName().toLowerCase();
+    const lastName = faker.name.lastName().toLowerCase();
     const hashCode = bcrypt.hashSync( faker.lorem.word(), bcrypt.genSaltSync(8) )
     const username = `${firstName} ${lastName}`;
     const email = firstName + "." + lastName + "@" + faker.internet.domainName();

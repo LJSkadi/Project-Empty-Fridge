@@ -13,38 +13,42 @@
   <body>
 
     <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
-      <a class="navbar-brand" href="/">Empty Fridge</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-          {{#if currentUser}}
-            <li class="nav-item">
-              <a class="nav-link" href="/user/{{currentUser._id}}/profile">
-                <img class="member-avatar" src="{{currentUser.profileImage}}" alt="{{currentUser.name}} profile image">
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/user/{{currentUser._id}}">{{currentUser.username}}'s Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/logout">Log out</a>
-            </li>
-          {{else}}
-            <li class="nav-item">
-              <a class="nav-link" href="/signup">Sign up</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/login">Log in</a>
-            </li>
-          {{/if}}
-        </ul>
+      <div class="container">
+        
+        <a class="navbar-brand" href="/">Empty Fridge</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            {{#if currentUser}}
+              <li class="nav-item">
+                <a class="nav-link" href="/user/{{currentUser._id}}/profile">
+                  <img class="member-avatar" src="{{currentUser.profileImage}}" alt="{{currentUser.name}} profile image">
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/user/{{currentUser._id}}">{{currentUser.username}}'s Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/logout">Log out</a>
+              </li>
+            {{else}}
+              <li class="nav-item">
+                <a class="nav-link" href="/signup">Sign up</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/login">Log in</a>
+              </li>
+            {{/if}}
+          </ul>
+        </div>
       </div>
     </nav>
 
-
-    {{{body}}}
+    <div class="container">
+      {{{body}}}
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

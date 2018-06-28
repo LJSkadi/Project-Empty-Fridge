@@ -92,13 +92,18 @@ privateRoutes.post('/user/:userId/profile/update', (req, res, next) => {
 //#region GET /Dashboard
 privateRoutes.get('/user/:userId', (req, res, next) => {
   Promise.all(
-    [User.findOne({ "_id": req.params.userId }),
-    List.find({ _creator: req.params.userId })]
+    [
+      User.findOne({ "_id": req.params.userId }),
+      List.find({ _creator: req.params.userId }).populate('_invitations'),
+      Invitation.find( {'receivingUser.email': 'silvio.galli@gmail.com'} )
+      .populate({ path: '_list', populate: { path: '_creator' } })
+    ]
   )
-    .then((array) => {
-      res.render('users/dashboard', { user: array[0], lists: array[1] });
-    })
-    .catch(err => { throw err });
+  .then( ( array ) => {
+    const receivedInvitations = array[2];
+    res.render( 'users/dashboard', { user: array[0], lists: array[1], receivedInvitations: receivedInvitations } );
+  })
+  .catch(err => { throw err });
 });
 //#endregion
 
