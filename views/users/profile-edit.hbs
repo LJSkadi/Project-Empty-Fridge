@@ -1,11 +1,11 @@
 <!-- PROFILE-EDIT.hbs -->
 {{#if message }}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>{{ message }}</strong>
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
-    </div>
+</div>
 {{/if}}
 <div class="cards-container d-flex flex-wrap justify-content-center align-content-center">
     <div class="card details" style="width: 20rem;">
@@ -24,6 +24,11 @@
                         <label for="">Password:</label>
                         <input class="form-control" type="password" name="password" placeholder="Enter a new password">
                     </div>
+                    {{#if message }}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>{{ message }}</strong>
+                    </div>
+                    {{/if}}
                     <div class="form-group">
                         <label for="photo">Image</label>
                         <input class="form-control-file" type="file" name="photo">

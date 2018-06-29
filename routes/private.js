@@ -7,7 +7,7 @@ const Item = require('../models/Item');
 const Invitation = require('../models/Invitation');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
-const uploadCloud   = require('../config/cloudinary.js');
+const uploadCloud = require('../config/cloudinary.js');
 // Bcrypt to encrypt passwords
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
@@ -66,30 +66,46 @@ privateRoutes.get('/user/:userId/profile/edit', (req, res, next) => {
 
 /* POST edit a truck*/
 privateRoutes.post('/user/:userId/profile-update', uploadCloud.single('photo'), (req, res, next) => {
-  console.log( "IMAGE FILE --->", req.file );
+  console.log("IMAGE FILE --->", req.file);
   let userId = req.params.userId;
   let newUsername = req.body.username;
   let newPassword = req.body.password;
+  let changePW = false;
+  console.log("This is the req.body", req.body)
+  console.log("This is req.user.password", req.user.password)
   let newImage = req.file ? req.file.secure_url : process.env.ANONYMOUS_USER;
   // Take care that no value is lost
-  if (newUsername === ""){
+  if (newUsername === "") {
     newUsername = req.user.username;
-  } else if( newPassword === "") {
-    newPassword = req.user.password;
+  } else if (newPassword !== '') {
+    if (!bcrypt.compareSync(newPassword, req.user.password)) {
+      const salt = bcrypt.genSaltSync(bcryptSalt);
+      const hashPass = bcrypt.hashSync(newPassword, salt);
+      newPassword = hashPass;
+    }
+    changePW = true;
   }
+  console.log("This is the req.body", req.body)
+  console.log("This is changePW", changePW)
   // Check if the password should be changed
-  if (!bcrypt.compareSync(newPassword, req.user.password)) {
-    const salt = bcrypt.genSaltSync(bcryptSalt);
-    const hashPass = bcrypt.hashSync(newPassword, salt);
-    newPassword = hashPass;
+  if (changePW === true) {
+    User.findByIdAndUpdate(userId, { username: newUsername, password: newPassword, profileImage: newImage }, { new: true })
+      .then(user => {
+        console.log(user)
+        res.redirect(`/user/${userId}/profile`)
+      })
+      .catch(err => { throw err });
+  } else {
+    User.findByIdAndUpdate(userId, { username: newUsername, profileImage: newImage }, { new: true })
+      .then(user => {
+        console.log(user)
+        res.redirect(`/user/${userId}/profile`)
+      })
+      .catch(err => { throw err });
   }
-  User.findByIdAndUpdate(userId, { username: newUsername, password: newPassword, profileImage: newImage }, { new: true })
-  .then( user => {
-    console.log(user)
-    res.redirect(`/user/${userId}/profile`)
-  })
-  .catch(err => { throw err });
+
 })
+
 //#endregion
 
 privateRoutes.get('/user/:userId/profile/delete', (req, res, next) => {
@@ -110,29 +126,13 @@ privateRoutes.get('/user/:userId/profile/delete', (req, res, next) => {
 privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
   console.log(req.body)
   let userId = req.user._id;
-  let listId = req.params.listId;
   List.find({ _creator: `${userId}` })
     .then(lists => {
+
       lists.forEach(element => {
         let listId = element._id;
-        console.log("This is the value of the listId", req.body['listId']);
-        let value = req.body['listId'];
-        if (value === 'delete'){
-          List.findById(listId)
-            .then(list => {
-              Item.deleteMany({ _list: listId })
-                .then(itemsDeleted => {
-                  List.findByIdAndRemove(listId)
-                    .then(listToDelete => {
-                      let message = "Your list is deleted successfully";
-
-                      res.redirect(`/user/${userId}`)
-                    })
-                })
-                .catch(err => { throw err })
-            })
-            .catch(err => { throw err })
-        } else {
+        let value = req.body[`${listId}`];
+        if (value !== 'delete') {
           //change the Owner of the list and remove the _creator from the members
           const memberId = value;
           List.findById(listId)
@@ -141,25 +141,41 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
             .then(list => {
               // removing member from list
               list._creator = memberId;
-              list._members.pull({ _id: req.params.userId });
+              console.log("This was creator", userId)
+              console.log("This is the new creator", list._creator)
+              console.log("This was the selected member", value)
               // updating list after removing member
               list.save((err, updatedList) => {
                 if (err) {
                   console.log("ERROR changing the Creator of the List --->", err);
                 } else {
-                  res.render(`/user/${userId}/profile/delete`, { message: `The new owner of your list is ${_creator.username}` });
+                  console.log(`The new owner changed`);
                 }
               });
+            })
+            .catch(err => { throw err })
+        } else if (value === 'delete'){
+          List.findById(listId)
+            .then(list => {
+              Item.deleteMany({ _list: listId })
+                .then(itemsDeleted => {
+                  List.findByIdAndRemove(listId)
+                    .then(listToDelete => {
+                      let message = "Your list is deleted successfully";
+                    })
+                    .catch(err => { throw err });
+                })
+                .catch(err => { throw err })
             })
             .catch(err => { throw err })
         }
       })
     })
-    .catch(err => { throw err });
+    .catch(err => { throw err })
 
-  User.findByIdAndRemove(req.params.userId)
+  User.findByIdAndRemove(userId)
     .then(user => {
-      res.render(`/signup`, { message: `Your account was deleted` });
+      res.render(`/users/signup`);
     })
     .catch(err => { throw err });
 })
@@ -173,15 +189,15 @@ privateRoutes.get('/user/:userId', (req, res, next) => {
     [
       User.findOne({ "_id": req.params.userId }),
       List.find({ _creator: req.params.userId }).populate('_invitations'),
-      Invitation.find( {'receivingUser.email': 'silvio.galli@gmail.com'} )
-      .populate({ path: '_list', populate: { path: '_creator' } })
+      Invitation.find({ 'receivingUser.email': 'silvio.galli@gmail.com' })
+        .populate({ path: '_list', populate: { path: '_creator' } })
     ]
   )
-  .then( ( array ) => {
-    const receivedInvitations = array[2];
-    res.render( 'users/dashboard', { user: array[0], lists: array[1], receivedInvitations: receivedInvitations } );
-  })
-  .catch(err => { throw err });
+    .then((array) => {
+      const receivedInvitations = array[2];
+      res.render('users/dashboard', { user: array[0], lists: array[1], receivedInvitations: receivedInvitations });
+    })
+    .catch(err => { throw err });
 });
 //#endregion
 
@@ -226,7 +242,7 @@ privateRoutes.post('/new-list', (req, res, next) => {
 
   let listName = (req.body.listname === "") ? undefined : req.body.listname;
   let creator = req.user._id;
-  List.create({ name: listName, _creator: creator, _members: [creator] })
+  List.create({ name: listName, _creator: creator })
     .then(list => {
       res.redirect(`/list/${list._id}`)
     })
@@ -258,7 +274,7 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
 //#endregion
 
 //#region POST/add-new-item
-privateRoutes.post('/list/:listId/add-new-item', isMember, (req, res, next) => {
+privateRoutes.post('/list/:listId/add-new-item', [isCreator, isMember], (req, res, next) => {
   const { listId, newItemInput } = req.body;
   const user = req.user;
 
@@ -283,7 +299,7 @@ privateRoutes.post('/list/:listId/add-new-item', isMember, (req, res, next) => {
 //#endregion
 
 //#region GET/delete-item
-privateRoutes.get('/list/:listId/delete-item/:itemId', isMember, (req, res, next) => {
+privateRoutes.get('/list/:listId/delete-item/:itemId', [isCreator, isMember], (req, res, next) => {
   Item.findByIdAndUpdate(req.params.itemId, { status: 'CLOSED' }, { new: true })
     .populate('_list')
     .then(updatedItem => {
@@ -293,7 +309,7 @@ privateRoutes.get('/list/:listId/delete-item/:itemId', isMember, (req, res, next
 })
 
 //#region GET/reactivate-item
-privateRoutes.get('/list/:listId/reactivate-item/:itemId', isMember, (req, res, next) => {
+privateRoutes.get('/list/:listId/reactivate-item/:itemId', [isCreator, isMember], (req, res, next) => {
   Item.findByIdAndUpdate(req.params.itemId, { status: 'OPEN' }, { new: true })
     .populate('_list')
     .then(updatedItem => {
