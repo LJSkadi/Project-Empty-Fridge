@@ -96,9 +96,9 @@
 
   <!-- SEARCH USERS -->
   <div class="col-md-3">
-    <form class="form-inline mt-3" action="/search-user" method="post">
+    <form class="mt-3" action="/search-user" method="post">
       <div class="form-group">
-        <input type="email" class="form-control" name="searchedEmail" placeholder="Search users with email">
+        <input type="text" class="form-control" name="searchedEmail" placeholder="Search users with email">
       </div>
       <input type="hidden" name="listId" value="{{list._id}}">
       <div class="form-group">
@@ -108,18 +108,17 @@
 
     <div id="search-result">
       {{#if foundUsers}}
-      <ul>
         {{#each foundUsers}}
-        <li>
-          <form action="/create-invitation" method="post">
+        
+          <form action="/create-invitation" method="post" class="form-inline shadow-sm my-2 d-flex justify-content-between">
+            <img src="{{this.profileImage}}" alt="" class="member-avatar">
+            <small>{{this.email}}</small>
             <input type="hidden" name="invitedUserId" value="{{this._id}}">
             <input type="hidden" name="listId" value="{{../list._id}}">
-            <button type="submit" class="btn btn-sm btn-success">Invite</button>
-            {{this.email}}
+            <button type="submit" class="btn btn-success btn-sm">Invite</button>
           </form>
-        </li>
+        
         {{/each}}
-      </ul>
       {{/if}}
     </div>
 

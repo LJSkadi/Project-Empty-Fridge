@@ -80,7 +80,7 @@ privateRoutes.post('/user/:userId/profile-update', uploadCloud.single('photo'), 
   let changePW = false;
   console.log("This is the req.body", req.body)
   console.log("This is req.user.password", req.user.password)
-  let newImage = req.file ? req.file.secure_url : process.env.ANONYMOUS_USER;
+  let newImage = req.file ? req.file.secure_url : req.user.profileImage;
   // Take care that no value is lost
   if (newUsername === "") {
     newUsername = req.user.username;
@@ -212,27 +212,26 @@ privateRoutes.get('/user/:userId', (req, res, next) => {
 
 //#region POST /search-user
 privateRoutes.post('/search-user', (req, res, next) => {
-  const query = req.body.searchedEmail ? { email: req.body.searchedEmail } : {};
+  const query = req.body.searchedEmail;
 
   List.findById(req.body.listId)
-    .populate('_items')
+    .populate({ path:'_items', populate: { path: '_fullFiller'}})
+    .populate({ path: '_items', populate: { path: '_creator'}})
+    .populate('_creator')
+    .populate('_members')
+    .populate('_invitations')
     .then(list => {
-      // show list
-      console.log("LIST AFTER SEARCHING USERS --->", list);
-      // filter items
       const openItems = list._items.filter((item) => item.status === 'OPEN');
       const closedItems = list._items.filter((item) => item.status === 'CLOSED');
-      // show items
-      console.log("OPEN ITEMS --->", openItems);
-      console.log("CLOSED ITEMS --->", closedItems);
-
-      User.find(query)
-        .then(searchedUsers => {
-          // show search result
-          console.log("The LIST of the USERS --->", searchedUsers);
-          res.render('lists/list-details', { list: list, openItems: openItems, closedItems: closedItems, foundUsers: searchedUsers });
-        })
-        .catch(err => { throw err });
+      const listMembers = list._members;
+      const pendingInvitations = list._invitations;
+      User.find( { email: { "$regex": query, "$options": "i" } } )
+      .then(searchedUsers => {
+        // show search result
+        console.log("The LIST of the USERS --->", searchedUsers);
+        res.render('lists/list-details', { list: list, openItems: openItems, closedItems: closedItems, listMembers: listMembers, pendingInvitations: pendingInvitations, foundUsers: searchedUsers })
+      })
+      .catch(err => { throw err });
     })
     .catch(err => { throw err });
 });
