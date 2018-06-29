@@ -20,7 +20,8 @@
                         {{#each lists}}
                         <li>
                             {{ this.name }}
-                            <a href="/delete-list/{{lists._id}}">delete</a>
+                            <a href="/delete-list/{{lists._id}}"><i class="fas fa-trash-alt"></i></a>
+                            <!--<a href="/delete-list/{{lists._id}}">delete</a>-->
                         </li>
                         {{/each}}
                     </ul>

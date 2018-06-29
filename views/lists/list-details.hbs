@@ -1,34 +1,51 @@
-<h1>{{ list.name }} <small>details</small></h1>
-    
+<h1>{{ list.name }}
+  <small>details</small>
+</h1>
+
 <div class="row">
   <div class="col-md-6">
     <h2>Items</h2>
-    {{#if openItems}}
-    <ul>
-      {{#each openItems}}
-        <li> 
-          <a href="/list/{{../list._id}}/delete-item/{{this._id}}">delete</a>
-          {{ this.content }} 
-        </li>
-      {{/each}}
-    </ul>
-    {{else}}
-      <p>You're list is empty. Add some content.</p>
+    {{#if openItems}} {{#each openItems}}
+    <div class="item-detail p-3 border rounded m-1 shadow-sm d-flex">
+
+      <div class="mr-2">
+        <a href="/list/{{../list._id}}/delete-item/{{this._id}}">
+          <i class="fas fa-trash-alt"></i>
+        </a>
+      </div>
+      <div>
+        {{ this.content }}
+      </div>
+      <div class="ml-auto bd-highlight">
+        <img src="{{ this._creator.profileImage}}" class="member-avatar">
+      </div>
+    </div>
+
+
+    {{/each}} {{else}}
+    <p>You're list is empty. Add some content.</p>
     {{/if}}
-    
+
     <h2>Closed Items</h2>
-    {{#if closedItems}}
-    <ul>
+    {{#if closedItems}} 
       {{#each closedItems}}
-        <li> 
-          <a href="/list/{{../list._id}}/reactivate-item/{{this._id}}">reactivate</a>
-          {{ this.content }} 
-        </li>
-      {{/each}}
-       {{else}}
-      <p>All items are open. Be a nice person and close.</p>
+    <div class="item-detail p-3 border rounded m-1 shadow-sm d-flex">
+
+      <div class="mr-2">
+        <a href="/list/{{../list._id}}/reactivate-item/{{this._id}}">
+          <i class="fas fa-redo"></i>
+        </a>
+      </div>
+      <div>
+        {{ this.content }}
+      </div>
+      <div class="ml-auto bd-highlight">
+        <img src="{{ this._fullFiller.profileImage}}" class="member-avatar">
+      </div>
+    </div>
+ {{/each}}
     {{/if}}
-    </ul>
+
 
     <form class="form-inline" action="/list/{{list._id}}/add-new-item" method="post">
       <div class="form-group mb-2">
@@ -42,35 +59,37 @@
   </div>
 
   <div class="col-md-3">
-    
+
     <!-- MEMBERS -->
     {{#if listMembers}}
-      <h3>List members</h3>
-      {{#each listMembers}}
-        <div class="badge badge-primary list-member mt-2">
-          <strong>{{this.username}}</strong>
-          <a href="/list/{{../list._id}}/delete-member/{{this.id}}" class="close">
-           <span>&times;</span>
-          </a>
-        </div>
-      {{/each}}
-    {{else}}
-      <h3>This list has no <em>members</em></h3>
+    <h3>List members</h3>
+    {{#each listMembers}}
+    <div class="badge badge-primary list-member mt-2">
+      <strong>{{this.username}}</strong>
+      <a href="/list/{{../list._id}}/delete-member/{{this.id}}" class="close">
+        <span>&times;</span>
+      </a>
+    </div>
+    {{/each}} {{else}}
+    <h3>This list has no
+      <em>members</em>
+    </h3>
     {{/if}}
 
     <!-- PENDING INVITATIONS -->
     {{#if pendingInvitations}}
-      <h3>Pending Invitations</h3>
-      {{#each pendingInvitations}}
-        <div class="badge badge-info pending-invitation mt-2">
-          <strong>{{this.receivingUser.username}}</strong>
-          <a href="/invitation/{{this._id}}/decline/{{this.refuseCode}}" class="close">
-           <span>&times;</span>
-          </a>
-        </div>
-      {{/each}}
-    {{else}}
-      <h3>This list has no <em>pending invitations</em></h3>
+    <h3>Pending Invitations</h3>
+    {{#each pendingInvitations}}
+    <div class="badge badge-info pending-invitation mt-2">
+      <strong>{{this.receivingUser.username}}</strong>
+      <a href="/invitation/{{this._id}}/decline/{{this.refuseCode}}" class="close">
+        <span>&times;</span>
+      </a>
+    </div>
+    {{/each}} {{else}}
+    <h3>This list has no
+      <em>pending invitations</em>
+    </h3>
     {{/if}}
 
   </div>
@@ -89,18 +108,18 @@
 
     <div id="search-result">
       {{#if foundUsers}}
-        <ul>
-          {{#each foundUsers}}
-            <li>
-              <form action="/create-invitation" method="post">
-                <input type="hidden" name="invitedUserId" value="{{this._id}}">
-                <input type="hidden" name="listId" value="{{../list._id}}">
-                <button type="submit" class="btn btn-sm btn-success">Invite</button>
-                {{this.email}}
-              </form>
-            </li>
-          {{/each}}
-        </ul>
+      <ul>
+        {{#each foundUsers}}
+        <li>
+          <form action="/create-invitation" method="post">
+            <input type="hidden" name="invitedUserId" value="{{this._id}}">
+            <input type="hidden" name="listId" value="{{../list._id}}">
+            <button type="submit" class="btn btn-sm btn-success">Invite</button>
+            {{this.email}}
+          </form>
+        </li>
+        {{/each}}
+      </ul>
       {{/if}}
     </div>
 

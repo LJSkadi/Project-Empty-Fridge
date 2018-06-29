@@ -23,12 +23,18 @@ function isIncluded(role) {
       .then(list => {
         if (role === "_creator") {
           console.log("I'm the creator")
-          list[role] === req.user._id
-          return next()
+          if(list[role] === req.user._id){
+          return next()}
+          if((list[role] !== req.user._id)){
+          return next(null, false);
+          }
         } else {
           console.log("I'm a member")
-          list[role].includes(req.user._id)
-          return next();
+          if(list[role].includes(req.user._id)){
+          return next()}
+          if((list[role] !== req.user._id)){
+            return next(null, false);
+          }
         }
       })
       .catch(err => { throw err })
@@ -262,7 +268,9 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
   let listId = req.params.listId;
 
   List.findById(listId)
-    .populate('_items')
+    .populate({ path:'_items', populate: { path: '_fullFiller'}})
+    .populate({ path: '_items', populate: { path: '_creator'}})
+    .populate('_creator')
     .populate('_members')
     .populate('_invitations')
     .then(list => {
@@ -303,7 +311,7 @@ privateRoutes.post('/list/:listId/add-new-item', [isCreator, isMember], (req, re
 
 //#region GET/delete-item
 privateRoutes.get('/list/:listId/delete-item/:itemId', [isCreator, isMember], (req, res, next) => {
-  Item.findByIdAndUpdate(req.params.itemId, { status: 'CLOSED' }, { new: true })
+  Item.findByIdAndUpdate(req.params.itemId, { status: 'CLOSED', _fullFiller: `${req.user._id}` }, { new: true })
     .populate('_list')
     .then(updatedItem => {
       res.redirect(`/list/${updatedItem._list._id}`)
@@ -313,7 +321,7 @@ privateRoutes.get('/list/:listId/delete-item/:itemId', [isCreator, isMember], (r
 
 //#region GET/reactivate-item
 privateRoutes.get('/list/:listId/reactivate-item/:itemId', [isCreator, isMember], (req, res, next) => {
-  Item.findByIdAndUpdate(req.params.itemId, { status: 'OPEN' }, { new: true })
+  Item.findByIdAndUpdate(req.params.itemId, { status: 'OPEN', _fullFiller: `${req.user._id}` }, { new: true })
     .populate('_list')
     .then(updatedItem => {
       res.redirect(`/list/${updatedItem._list._id}`)
