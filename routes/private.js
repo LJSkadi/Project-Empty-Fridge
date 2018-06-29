@@ -99,13 +99,15 @@ privateRoutes.get('/user/:userId', (req, res, next) => {
     [
       User.findOne({ "_id": req.params.userId }),
       List.find({ _creator: req.params.userId }).populate('_invitations'),
-      Invitation.find( {'receivingUser.email': 'silvio.galli@gmail.com'} )
+      List.find({ _members: { $in: [ req.params.userId ] } } ).populate('_creator'),
+      Invitation.find( { 'receivingUser.email': req.user.email } )
       .populate({ path: '_list', populate: { path: '_creator' } })
     ]
   )
   .then( ( array ) => {
-    const receivedInvitations = array[2];
-    res.render( 'users/dashboard', { user: array[0], lists: array[1], receivedInvitations: receivedInvitations } );
+    const membershipLists = array[2];
+    const receivedInvitations = array[3];
+    res.render( 'users/dashboard', { user: array[0], lists: array[1], membershipLists: membershipLists, receivedInvitations: receivedInvitations } );
   })
   .catch(err => { throw err });
 });

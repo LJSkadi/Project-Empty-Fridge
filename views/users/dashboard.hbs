@@ -11,6 +11,25 @@
       {{#each lists}}
         <div class="shadow bg-light my-4 p-2">
           <p class="lead">
+            <a href="/list/{{this._id}}">{{this.name}}</a>
+          </p>
+        </div>
+      {{/each}}
+    {{else}}
+      <p class="lead">
+        Please, put some lists here...
+      </p>
+    {{/if}}
+    
+    <hr>
+
+    <h2>
+      Guest Lists 
+    </h2>
+    {{#if membershipLists}}
+      {{#each lists}}
+        <div class="shadow bg-light my-4 p-2">
+          <p class="lead">
             {{this.name}}
           </p>
         </div>
@@ -71,10 +90,10 @@
         <div>
           <b>{{this._list._creator.username}}</b> asks to join on <b>{{this._list.name}}</b>
           <br>
-          <a class="btn btn-success btn-sm" href="/invitation/{{this._list._id}}/confirm/{{this.confirmationCode}}">
+          <a class="btn btn-success btn-sm" href="/invitation/{{this._id}}/confirm/{{this.confirmationCode}}">
             Accept
           </a>
-          <a class="btn btn-danger btn-sm" href="/invitation/{{this._list._id}}/decline/{{this.refuseCode}}">
+          <a class="btn btn-danger btn-sm" href="/invitation/{{this._id}}/decline/{{this.refuseCode}}">
             Decline
           </a>
           <hr>
