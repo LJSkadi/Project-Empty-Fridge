@@ -7,6 +7,7 @@ const Item = require('../models/Item');
 const Invitation = require('../models/Invitation');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
+const mongoose     = require('mongoose');
 const uploadCloud = require('../config/cloudinary.js');
 // Bcrypt to encrypt passwords
 const bcrypt = require("bcrypt");
@@ -185,13 +186,14 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
 //#region LIST
 //#region GET /Dashboard
 privateRoutes.get('/user/:userId', (req, res, next) => {
+
   Promise.all(
     [
       User.findOne({ "_id": req.params.userId }),
       List.find({ _creator: req.params.userId }).populate('_invitations'),
       List.find({ _members: { $in: [ req.params.userId ] } } ).populate('_creator'),
       Invitation.find( { 'receivingUser.email': req.user.email } )
-      .populate({ path: '_list', populate: { path: '_creator' } })
+      .populate({ path: '_list', populate: { path: '_creator' } }),
     ]
   )
   .then( ( array ) => {

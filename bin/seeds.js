@@ -162,7 +162,7 @@ Promise.all(
   populateMembers( 6, silvioList ),
   // #7 adding members to Elliot's list
   populateMembers( 6, elliotList )
-]
+  ]
 )
 .then( ( result ) => {
   
@@ -178,7 +178,7 @@ Promise.all(
 
   setTimeout( () => {
     mongoose.disconnect();
-  }, 8000)
+  }, 12000)
     
 })
 .catch( err => { throw err } );

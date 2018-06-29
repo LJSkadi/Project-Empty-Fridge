@@ -27,10 +27,10 @@
       Guest Lists 
     </h2>
     {{#if membershipLists}}
-      {{#each lists}}
+      {{#each membershipLists}}
         <div class="shadow bg-light my-4 p-2">
           <p class="lead">
-            {{this.name}}
+            <a href="/list/{{this._id}}">{{this.name}}</a>
           </p>
         </div>
       {{/each}}
