@@ -129,7 +129,6 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
   let userId = req.user._id;
   List.find({ _creator: `${userId}` })
     .then(lists => {
-
       lists.forEach(element => {
         let listId = element._id;
         let value = req.body[`${listId}`];
@@ -162,7 +161,7 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
                 .then(itemsDeleted => {
                   List.findByIdAndRemove(listId)
                     .then(listToDelete => {
-                      let message = "Your list is deleted successfully";
+                      console.log("Your list is deleted successfully");
                     })
                     .catch(err => { throw err });
                 })
@@ -176,7 +175,7 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
 
   User.findByIdAndRemove(userId)
     .then(user => {
-      res.render(`/users/signup`);
+      res.redirect('/signup');
     })
     .catch(err => { throw err });
 })
