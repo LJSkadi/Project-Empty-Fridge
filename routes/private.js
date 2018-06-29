@@ -161,7 +161,7 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
                 .then(itemsDeleted => {
                   List.findByIdAndRemove(listId)
                     .then(listToDelete => {
-                      let message = "Your list is deleted successfully";
+                      console.log("Your list is deleted successfully");
                     })
                     .catch(err => { throw err });
                 })
@@ -175,7 +175,7 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
 
   User.findByIdAndRemove(userId)
     .then(user => {
-      res.render(`/users/signup`);
+      res.redirect('/signup');
     })
     .catch(err => { throw err });
 })
