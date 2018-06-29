@@ -128,7 +128,6 @@ privateRoutes.post('/user/:userId/profile/delete', (req, res, next) => {
   let userId = req.user._id;
   List.find({ _creator: `${userId}` })
     .then(lists => {
-
       lists.forEach(element => {
         let listId = element._id;
         let value = req.body[`${listId}`];
