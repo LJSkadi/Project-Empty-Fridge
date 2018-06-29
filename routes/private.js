@@ -71,7 +71,7 @@ privateRoutes.get('/user/:userId/profile/edit', (req, res, next) => {
 });
 //#endregion
 
-/* POST edit a truck*/
+//#region POST /Profile-update
 privateRoutes.post('/user/:userId/profile-update', uploadCloud.single('photo'), (req, res, next) => {
   console.log("IMAGE FILE --->", req.file);
   let userId = req.params.userId;
@@ -112,7 +112,6 @@ privateRoutes.post('/user/:userId/profile-update', uploadCloud.single('photo'), 
   }
 
 })
-
 //#endregion
 
 privateRoutes.get('/user/:userId/profile/delete', (req, res, next) => {
@@ -463,9 +462,7 @@ privateRoutes.get('/delete-list/:listId', isCreator, (req, res, next) => {
         .then(itemsDeleted => {
           List.findByIdAndRemove(req.params.listId)
             .then(listToDelete => {
-              let message = "Your list is deleted successfully";
-
-              res.redirect(`/user/${userId}`)
+              res.redirect(`/user/${userId}/profile`)
             })
         })
         .catch(err => { throw err })
