@@ -4,6 +4,16 @@
 
 <div class="row">
   <div class="col-md-6">
+    <form class="form-inline" action="/list/{{list._id}}/add-new-item" method="post">
+      <div class="form-group mb-2">
+        <input type="text" class="form-control" name="newItemInput" placeholder="Enter item">
+      </div>
+      <div class="form-group">
+        <input name="listId" type="hidden" value="{{list._id}}">
+      </div>
+      <button type="submit" class="btn btn-success mb-2">Add Item</button>
+    </form>
+
     <h2>Items</h2>
     {{#if openItems}} {{#each openItems}}
     <div class="item-detail p-3 border rounded m-1 shadow-sm d-flex">
@@ -27,35 +37,24 @@
     {{/if}}
 
     <h2>Closed Items</h2>
-    {{#if closedItems}} 
-      {{#each closedItems}}
-    <div class="item-detail p-3 border rounded m-1 shadow-sm d-flex">
+      {{#if closedItems}} 
+        {{#each closedItems}}
+          <div class="item-detail p-3 border rounded m-1 shadow-sm d-flex">
 
-      <div class="mr-2">
-        <a href="/list/{{../list._id}}/reactivate-item/{{this._id}}">
-          <i class="fas fa-redo"></i>
-        </a>
-      </div>
-      <div>
-        {{ this.content }}
-      </div>
-      <div class="ml-auto bd-highlight">
-        <img src="{{ this._fullFiller.profileImage}}" class="member-avatar">
-      </div>
-    </div>
- {{/each}}
+            <div class="mr-2">
+              <a href="/list/{{../list._id}}/reactivate-item/{{this._id}}">
+                <i class="fas fa-redo"></i>
+              </a>
+            </div>
+            <div>
+              {{ this.content }}
+            </div>
+            <div class="ml-auto bd-highlight">
+              <img src="{{ this._fullFiller.profileImage}}" class="member-avatar">
+            </div>
+          </div>
+      {{/each}}
     {{/if}}
-
-
-    <form class="form-inline" action="/list/{{list._id}}/add-new-item" method="post">
-      <div class="form-group mb-2">
-        <input type="text" class="form-control" name="newItemInput" placeholder="Enter item">
-      </div>
-      <div class="form-group">
-        <input name="listId" type="hidden" value="{{list._id}}">
-      </div>
-      <button type="submit" class="btn btn-success mb-2">Add Item</button>
-    </form>
   </div>
 
   <div class="col-md-3">
