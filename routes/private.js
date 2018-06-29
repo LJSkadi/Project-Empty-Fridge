@@ -22,18 +22,20 @@ function isIncluded(role) {
     List.findById(listId)
       .then(list => {
         if (role === "_creator") {
+          if(`${list[role]}` == `${req.user._id}`){
           console.log("I'm the creator")
-          if(list[role] === req.user._id){
           return next()}
-          if((list[role] !== req.user._id)){
-          return next(null, false);
+          else
+          {
+            res.redirect(`/list/${listId}`)
           }
-        } else {
+          } else {
           console.log("I'm a member")
           if(list[role].includes(req.user._id)){
-          return next()}
-          if((list[role] !== req.user._id)){
-            return next(null, false);
+          return next()
+        }else
+        {
+            res.redirect(`/user/${req.user._id}`)
           }
         }
       })
@@ -210,7 +212,7 @@ privateRoutes.get('/user/:userId', (req, res, next) => {
 //#endregion
 
 //#region POST /search-user
-privateRoutes.post('/search-user', (req, res, next) => {
+privateRoutes.post('/search-user', isCreator, (req, res, next) => {
   const query = req.body.searchedEmail;
 
   List.findById(req.body.listId)
