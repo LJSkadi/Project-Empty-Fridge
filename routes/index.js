@@ -40,7 +40,7 @@ router.get('/invitation/:invitationId/confirm/:confirmationCode', (req, res, nex
           Invitation.findByIdAndRemove( invitation._id )
           .then( () => {
             console.log( "Member confirmed!!! Invitation deleted." )
-            res.redirect('/');
+            res.redirect(`/user/${req.user._id}`);
           } )
           .catch( err => { throw err } );
         }
