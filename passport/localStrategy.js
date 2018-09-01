@@ -11,17 +11,17 @@ passport.use(new LocalStrategy( {usernameField: 'email'}, (email, password, next
     }
 
     if (!foundUser) {
-      next(null, false, { message: 'Incorrect email-address' });
+      next(null, false, { message: 'Incorrect credentials', messageType: "warning" });
       return;
     }
 
     if (!foundUser.status) {
-      next(null, false, { message: 'You should confirm your account before proceeding. Look your emails or require a new confirmation email.' });
+      next(null, false, { message: 'You should confirm your account before proceeding. Look your emails or require a new confirmation email.', messageType: "warning" });
       return;
     }
 
     if (!bcrypt.compareSync(password, foundUser.password)) {
-      next(null, false, { message: 'Incorrect password' });
+      next(null, false, { message: 'Incorrect credentials', messageType: "warning" });
       return;
     }
 

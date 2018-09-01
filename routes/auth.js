@@ -67,23 +67,27 @@ authRoutes.post("/signup", uploadCloud.single('photo'), (req, res, next) => {
         res.render("users/signup", { message: "Something went wrong" });
       } else {
         transporter.sendMail({
-          from: '"Empty Fridge Project 👻" <empty.fridge@gmail.com>',
+          from: '"Empty Fridge Project 👻" <do.you.have.an.empty.fridge@gmail.com>',
           to: email, 
           subject: subject, 
           text: message,
           html: `<b>Hi ${username}, ${message} <a href='${process.env.HTTP_ROOT_URL}/confirm/${confirmationCode}'>confirmation link</a></b>`
-        })
-        .then(info => {
+        }, (err, info) => {
+          if ( err ) {
+            console.log("ERROR CREATING USER: ", error);
+            console.log( "Redirecting new user to login page." )
+            res.render("users/signup", {
+              message: "Something went wrong sending your confirmation email. Pleasetry to signup again.",
+              messageType: "warning"
+            });
+          }
           console.log( "EMAIL SENT!!!", info );
           console.log( "Redirecting new user to login page." )
-          res.redirect("/login");
+          res.render("users/login", {
+            message: "We sent you a confirmation email. Please check your email box and confirm the creation of this account.",
+            messageType: "info"
+          });
         })
-        .catch(error => {
-          console.log("ERROR CREATING USER: ", error);
-          console.log( "Redirecting new user to login page." )
-          res.redirect("/login");
-        });
-        
       }
     });
   });
@@ -109,7 +113,7 @@ authRoutes.post("/login", passport.authenticate("local", {
 });
 
 //#region GET /confirm/ from email
-authRoutes.get('/confirm/:confirmationCode', (req,res, next) => {
+authRoutes.get('/confirm/:confirmationCode', (req, res, next) => {
   const hashCode = req.params.confirmationCode;
   User.findOne({ confirmationCode: hashCode })
   .then( user => {
@@ -117,7 +121,8 @@ authRoutes.get('/confirm/:confirmationCode', (req,res, next) => {
     .then(updatedUser => {
       console.log( "Welcome! User account activated." );
       res.render('users/login', {
-        message: "Your account is activated. Now you can login."
+        message: "Your account is activated. Now you can login.",
+        messageType: "success"
       });
     })
   })
