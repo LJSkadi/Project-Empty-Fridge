@@ -35,7 +35,7 @@ function isIncluded(role) {
           return next()
         }else
         {
-            res.redirect(`/user/${req.user._id}`)
+            res.redirect(`/list/${listId}`)
           }
         }
       })
@@ -212,7 +212,7 @@ privateRoutes.get('/user/:userId', (req, res, next) => {
 //#endregion
 
 //#region POST /search-user
-privateRoutes.post('/search-user', isCreator, (req, res, next) => {
+privateRoutes.post('/search-user', (req, res, next) => {
   const query = req.body.searchedEmail;
 
   List.findById(req.body.listId)
@@ -285,7 +285,7 @@ privateRoutes.get('/list/:listId', (req, res, next) => {
 //#endregion
 
 //#region POST/add-new-item
-privateRoutes.post('/list/:listId/add-new-item', [isCreator, isMember], (req, res, next) => {
+privateRoutes.post('/list/:listId/add-new-item', (req, res, next) => {
   const { listId, newItemInput } = req.body;
   const user = req.user;
 
@@ -310,7 +310,7 @@ privateRoutes.post('/list/:listId/add-new-item', [isCreator, isMember], (req, re
 //#endregion
 
 //#region GET/delete-item
-privateRoutes.get('/list/:listId/delete-item/:itemId', [isCreator, isMember], (req, res, next) => {
+privateRoutes.get('/list/:listId/delete-item/:itemId', (req, res, next) => {
   Item.findByIdAndUpdate(req.params.itemId, { status: 'CLOSED', _fullFiller: `${req.user._id}` }, { new: true })
     .populate('_list')
     .then(updatedItem => {
@@ -320,7 +320,7 @@ privateRoutes.get('/list/:listId/delete-item/:itemId', [isCreator, isMember], (r
 })
 
 //#region GET/reactivate-item
-privateRoutes.get('/list/:listId/reactivate-item/:itemId', [isCreator, isMember], (req, res, next) => {
+privateRoutes.get('/list/:listId/reactivate-item/:itemId', (req, res, next) => {
   Item.findByIdAndUpdate(req.params.itemId, { status: 'OPEN', _fullFiller: `${req.user._id}` }, { new: true })
     .populate('_list')
     .then(updatedItem => {
@@ -331,7 +331,7 @@ privateRoutes.get('/list/:listId/reactivate-item/:itemId', [isCreator, isMember]
 //#endregion
 
 //#region DELETE MEMBER FROM LIST -> GET /list/listId/delete-member/memberId
-privateRoutes.get('/list/:listId/delete-member/:memberId', isCreator, (req, res, next) => {
+privateRoutes.get('/list/:listId/delete-member/:memberId', (req, res, next) => {
   const listId = req.params.listId;
   const memberId = req.params.memberId;
   List.findById(listId)
@@ -362,7 +362,7 @@ let transporter = nodemailer.createTransport({
 })
 
 //#region POST /create-invitation
-privateRoutes.post("/create-invitation", isCreator, (req, res, next) => {
+privateRoutes.post("/create-invitation", (req, res, next) => {
   const sendingUser = req.user;
   const invitedUserId = req.body.invitedUserId;
   const listId = req.body.listId;
@@ -455,7 +455,7 @@ privateRoutes.get("/logout", (req, res) => {
 //#endregion
 
 //#region GET/delete-list
-privateRoutes.get('/delete-list/:listId', isCreator, (req, res, next) => {
+privateRoutes.get('/delete-list/:listId', (req, res, next) => {
   let userId = req.user._id;
   let listId = req.params.listId;
   List.findById(listId)
